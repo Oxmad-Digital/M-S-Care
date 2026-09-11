@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-montserrat);
+
+  --color-ms-primary: #14574b;
+  --color-ms-primary-dark: #0b2f29;
+  --color-ms-accent: #289280;
+  --color-ms-accent-dark: #14574b;
+  --color-ms-bg: #f2f8f4;
+  --color-ms-ink: #17342e;
+  --color-ms-text: #3d5a53;
+  --color-ms-text-soft: #4a6660;
+  --color-ms-text-muted: #8aa9a1;
+  --color-ms-badge: #e4f1ea;
+  --color-ms-mint: #9fe3d2;
+  --color-ms-border: rgba(40, 146, 128, 0.18);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-ms-ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+@keyframes ms-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-ms-rise {
+  animation: ms-rise 700ms ease-out both;
+}

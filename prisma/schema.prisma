@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ProductCategory {
+  MEDICAMENT
+  OTC
+  SUPPLEMENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}
+
+model Product {
+  id              String          @id @default(cuid())
+  slug            String          @unique
+  name            String
+  category        ProductCategory
+  principeActif   String
+  dosages         String[]
+  forme           String
+  conditionnement String
+  classe          String
+  indications     String
+  flavor          String?
+  imageUrl        String
+  noticeUrl       String
+  published       Boolean         @default(true)
+  order           Int             @default(0)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  phone     String?
+  subject   String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
