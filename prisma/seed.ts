@@ -1,7 +1,13 @@
 import { PrismaClient, ProductCategory } from "@prisma/client";
+import { PrismaNeon } from "@prisma/adapter-neon";
+import { neonConfig } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
+import ws from "ws";
 
-const prisma = new PrismaClient();
+neonConfig.webSocketConstructor = ws;
+
+const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 const NOTICE_URL =
   "https://www.notion.so/320ec75d765080248dabc090a6b5a5b6?v=320ec75d7650808a8c8d000c5e9401ff&source=copy_link";
