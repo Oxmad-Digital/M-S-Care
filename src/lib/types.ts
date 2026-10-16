@@ -13,7 +13,7 @@ export type CatalogueProduct = {
   indications: string;
   flavor: string | null;
   imageUrl: string;
-  noticeUrl: string;
+  notices: { id: string; label: string; url: string }[];
 };
 
 export const CATEGORY_LABEL: Record<ProductCategory, string> = {

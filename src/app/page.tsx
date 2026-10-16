@@ -14,6 +14,12 @@ export default async function Home() {
   const products = await prisma.product.findMany({
     where: { published: true },
     orderBy: { order: "asc" },
+    include: {
+      notices: {
+        orderBy: { position: "asc" },
+        select: { id: true, label: true, url: true },
+      },
+    },
   });
 
   return (

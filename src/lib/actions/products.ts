@@ -33,19 +33,29 @@ function readProductFields(formData: FormData) {
     indications: String(formData.get("indications") ?? "").trim(),
     flavor: String(formData.get("flavor") ?? "").trim() || null,
     imageUrl: String(formData.get("imageUrl") ?? "").trim(),
-    noticeUrl: String(formData.get("noticeUrl") ?? "").trim(),
     published: formData.get("published") === "on",
   };
 }
 
+function readNotices(formData: FormData) {
+  const labels = formData.getAll("noticeLabel").map((v) => String(v).trim());
+  const urls = formData.getAll("noticeUrl").map((v) => String(v).trim());
+
+  return urls
+    .map((url, index) => ({ label: labels[index] || "Notice", url }))
+    .filter((notice) => notice.url)
+    .map((notice, position) => ({ ...notice, position }));
+}
+
 export async function createProduct(formData: FormData) {
   const fields = readProductFields(formData);
+  const notices = readNotices(formData);
   const slug = slugify(fields.name);
 
   const count = await prisma.product.count();
 
   await prisma.product.create({
-    data: { ...fields, slug, order: count },
+    data: { ...fields, slug, order: count, notices: { create: notices } },
   });
 
   revalidatePath("/");
@@ -55,10 +65,11 @@ export async function createProduct(formData: FormData) {
 
 export async function updateProduct(id: string, formData: FormData) {
   const fields = readProductFields(formData);
+  const notices = readNotices(formData);
 
   await prisma.product.update({
     where: { id },
-    data: fields,
+    data: { ...fields, notices: { deleteMany: {}, create: notices } },
   });
 
   revalidatePath("/");

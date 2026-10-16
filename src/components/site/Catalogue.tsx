@@ -14,11 +14,67 @@ const TABS: { key: ProductCategory | "all"; label: string }[] = [
 
 const PAGE_SIZE = 6;
 
+type Notice = CatalogueProduct["notices"][number];
+
+const normalize = (value: string) => value.replace(/\s+/g, "").toLowerCase();
+
+// Associe chaque dosage à la première notice (par position) de même libellé.
+function matchDosageNotices(product: CatalogueProduct) {
+  const byDosage = new Map<string, Notice>();
+  for (const dosage of product.dosages) {
+    const notice = product.notices.find(
+      (n) => normalize(n.label) === normalize(dosage),
+    );
+    if (notice) byDosage.set(dosage, notice);
+  }
+  const linkedIds = new Set([...byDosage.values()].map((n) => n.id));
+  const otherNotices = product.notices.filter((n) => !linkedIds.has(n.id));
+  return { byDosage, otherNotices };
+}
+
+const DOSAGE_BADGE_CLASS =
+  "rounded-md px-[15px] py-[9px] text-[13.5px] font-semibold";
+
+function DosageSelector({
+  dosage,
+  selectable,
+  pressed,
+  onSelect,
+}: {
+  dosage: string;
+  selectable: boolean;
+  pressed: boolean;
+  onSelect: () => void;
+}) {
+  if (!selectable) {
+    return (
+      <span className={`${DOSAGE_BADGE_CLASS} bg-ms-badge text-ms-primary`}>
+        {dosage}
+      </span>
+    );
+  }
+  return (
+    <button
+      type="button"
+      aria-pressed={pressed}
+      onClick={onSelect}
+      className={`${DOSAGE_BADGE_CLASS} cursor-pointer ring-1 transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ms-accent ${
+        pressed
+          ? "bg-ms-accent text-white ring-ms-accent"
+          : "bg-ms-badge text-ms-primary ring-ms-accent/30 hover:ring-ms-accent"
+      }`}
+    >
+      {dosage}
+    </button>
+  );
+}
+
 export function Catalogue({ products }: { products: CatalogueProduct[] }) {
   const [filter, setFilter] = useState<ProductCategory | "all">("all");
   const [query, setQuery] = useState("");
   const [limit, setLimit] = useState(PAGE_SIZE);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedDosage, setSelectedDosage] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -43,15 +99,24 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
 
   const openProduct = (id: string) => {
     setSelectedId(id);
+    setSelectedDosage(null);
     scrollToCatalog();
   };
 
   const closeDetail = () => {
     setSelectedId(null);
+    setSelectedDosage(null);
     scrollToCatalog();
   };
 
   if (selected) {
+    const { byDosage, otherNotices } = matchDosageNotices(selected);
+    // Par défaut (état null) : le premier dosage qui a une notice.
+    const activeDosage =
+      selectedDosage && byDosage.has(selectedDosage)
+        ? selectedDosage
+        : selected.dosages.find((d) => byDosage.has(d)) ?? null;
+    const activeNotice = activeDosage ? byDosage.get(activeDosage) : undefined;
     return (
       <div className="animate-ms-rise">
         <button
@@ -90,12 +155,13 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
             </p>
             <div className="mb-[34px] flex flex-wrap gap-2">
               {selected.dosages.map((d) => (
-                <span
+                <DosageSelector
                   key={d}
-                  className="rounded-md bg-ms-badge px-[15px] py-[9px] text-[13.5px] font-semibold text-ms-primary"
-                >
-                  {d}
-                </span>
+                  dosage={d}
+                  selectable={byDosage.has(d)}
+                  pressed={d === activeDosage}
+                  onSelect={() => setSelectedDosage(d)}
+                />
               ))}
             </div>
             <dl className="mb-9 grid gap-0 border-t border-ms-accent/20">
@@ -119,14 +185,37 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
               ))}
             </dl>
             <div className="flex flex-wrap gap-3">
-              <a
-                href={selected.noticeUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
-              >
-                Consulter la notice du produit
-              </a>
+              {activeDosage && activeNotice && (
+                <a
+                  href={activeNotice.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`Consulter la notice du produit, dosage ${activeDosage}`}
+                  className="rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+                >
+                  Consulter la notice du produit
+                </a>
+              )}
+              {otherNotices.map((notice) => {
+                // Plusieurs notices : le libellé distingue des boutons au texte identique.
+                const description =
+                  selected.notices.length > 1
+                    ? `Consulter la notice du produit, ${notice.label}`
+                    : undefined;
+                return (
+                  <a
+                    key={notice.id}
+                    href={notice.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={description}
+                    title={description}
+                    className="rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+                  >
+                    Consulter la notice du produit
+                  </a>
+                );
+              })}
               <a
                 href="#contacts"
                 className="rounded-full border border-ms-accent/40 px-[26px] py-[15px] text-[15px] font-semibold text-ms-primary transition hover:bg-ms-accent/10"

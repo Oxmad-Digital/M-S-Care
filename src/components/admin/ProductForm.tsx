@@ -1,5 +1,6 @@
-import type { Product } from "@prisma/client";
+import type { Notice, Product } from "@prisma/client";
 import { ProductCategory } from "@prisma/client";
+import { NoticesField } from "./NoticesField";
 
 const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
   { value: ProductCategory.MEDICAMENT, label: "Medicaments" },
@@ -15,7 +16,7 @@ export function ProductForm({
   product,
 }: {
   action: (formData: FormData) => void;
-  product?: Product;
+  product?: Product & { notices: Notice[] };
 }) {
   return (
     <form action={action} className="grid max-w-2xl gap-5">
@@ -147,18 +148,7 @@ export function ProductForm({
         />
       </label>
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          URL de la notice
-        </span>
-        <input
-          name="noticeUrl"
-          type="text"
-          required
-          defaultValue={product?.noticeUrl}
-          className={fieldClass}
-        />
-      </label>
+      <NoticesField notices={product?.notices ?? []} />
 
       <label className="flex items-center gap-2.5">
         <input

@@ -24,6 +24,7 @@ type RawProduct = {
   indications: string;
   flavor?: string;
   imageUrl: string;
+  notices?: { label: string; url: string }[];
 };
 
 const PRODUCTS: RawProduct[] = [
@@ -51,6 +52,12 @@ const PRODUCTS: RawProduct[] = [
     indications: "Déparasitage",
     flavor: "Fruité, vanille & orange",
     imageUrl: "/images/products/aldacare.png",
+    notices: [
+      {
+        label: "Notice",
+        url: "https://pub-7b3c282200ff4b619ea4795ce9f25bb7.r2.dev/aldacare-200.pdf",
+      },
+    ],
   },
   {
     slug: "azithcare",
@@ -164,10 +171,16 @@ async function main() {
   });
 
   for (const [index, product] of PRODUCTS.entries()) {
+    const { notices = [{ label: "Notice", url: NOTICE_URL }], ...fields } = product;
+    const noticeData = notices.map((notice, position) => ({ ...notice, position }));
     await prisma.product.upsert({
       where: { slug: product.slug },
-      update: { ...product, order: index, noticeUrl: NOTICE_URL },
-      create: { ...product, order: index, noticeUrl: NOTICE_URL },
+      update: {
+        ...fields,
+        order: index,
+        notices: { deleteMany: {}, create: noticeData },
+      },
+      create: { ...fields, order: index, notices: { create: noticeData } },
     });
   }
 
