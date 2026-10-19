@@ -39,3 +39,150 @@
     background: linear-gradient(90deg, rgb(11 47 41 / 94%), rgb(11 47 41 / 65%));
   }
 }
+
+/*
+ * Séquence d'entrée, en CSS pour démarrer dès le premier affichage (sans attendre le JS).
+ * Chaque keyframe ne décrit que l'état de départ : sans animation, tout est à sa place.
+ */
+
+/* Voile sombre qui se lève sur la photo ; l'image reste peinte dessous pour le LCP. */
+.veil {
+  background: var(--color-ms-primary-dark);
+  opacity: 0;
+  animation: hero-fade-out 1300ms var(--ease-out-expo) both;
+}
+
+.image {
+  animation: hero-zoom 2400ms var(--ease-out-expo) both;
+}
+
+/* Rosace qui s'ouvre depuis le centre, puis tourne très lentement. */
+.rings {
+  animation:
+    hero-iris 2200ms var(--ease-in-out-quart) 300ms both,
+    hero-spin 180s linear 2500ms infinite;
+}
+
+.eyebrow {
+  animation: hero-track 1200ms var(--ease-out-expo) 350ms both;
+}
+
+.word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+
+.word > span {
+  display: inline-block;
+  animation: hero-word 1000ms var(--ease-out-expo) both;
+  animation-delay: calc(450ms + var(--i) * 70ms);
+}
+
+.lead {
+  animation: hero-rise 900ms var(--ease-out-expo) 900ms both;
+}
+
+.actions {
+  animation: hero-rise 900ms var(--ease-out-expo) 1050ms both;
+}
+
+.card {
+  animation: hero-rise 1000ms var(--ease-out-expo) 1250ms both;
+}
+
+/* Indicateur de défilement : un point glisse le long d'un fil. */
+.cue {
+  animation: hero-fade-in 800ms ease-out 1800ms both;
+}
+
+.cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: white;
+  transform: translateY(-100%);
+  animation: hero-cue 2200ms var(--ease-in-out-quart) 2000ms infinite;
+}
+
+@keyframes hero-fade-out {
+  from {
+    opacity: 1;
+  }
+}
+
+@keyframes hero-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hero-zoom {
+  from {
+    scale: 1.14;
+  }
+}
+
+@keyframes hero-iris {
+  from {
+    clip-path: circle(0% at 50% 50%);
+  }
+  to {
+    clip-path: circle(71% at 50% 50%);
+  }
+}
+
+@keyframes hero-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes hero-track {
+  from {
+    opacity: 0;
+    letter-spacing: 0.45em;
+  }
+}
+
+@keyframes hero-word {
+  from {
+    transform: translateY(110%);
+  }
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes hero-cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  50% {
+    transform: none;
+  }
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .veil,
+  .image,
+  .rings,
+  .eyebrow,
+  .word > span,
+  .lead,
+  .actions,
+  .card,
+  .cue,
+  .cue::after {
+    animation: none;
+  }
+}

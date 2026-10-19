@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, m } from "motion/react";
+import { EASE_IN_OUT_QUART, EASE_OUT_EXPO } from "@/components/motion/tokens";
 
 const NAV_LINKS = [
   { href: "/#nosproduits", id: "nosproduits", label: "Nos produits" },
@@ -13,6 +15,15 @@ const NAV_LINKS = [
 
 // Au-delà de ce défilement, le header passe en version compacte et opaque.
 const SCROLL_THRESHOLD = 40;
+// Le header se retire quand on descend au-delà de cette hauteur, et revient dès qu'on remonte.
+const HIDE_AFTER = 320;
+// Ignore les micro-défilements (trackpad, inertie) pour éviter les clignotements.
+const SCROLL_DELTA = 8;
+
+const MENU_ITEM = {
+  hidden: { opacity: 0, y: 12 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE_OUT_EXPO } },
+};
 
 type HeaderProps = {
   // Header transparent posé sur le hero tant que la page n'a pas défilé.
@@ -23,10 +34,18 @@ export function Header({ overlay = false }: HeaderProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [activeSection, setActiveSection] = useState<string | null>(null);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > SCROLL_THRESHOLD);
+    let lastY = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > SCROLL_THRESHOLD);
+      if (Math.abs(y - lastY) < SCROLL_DELTA) return;
+      setHidden(y > lastY && y > HIDE_AFTER);
+      lastY = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -72,9 +91,17 @@ export function Header({ overlay = false }: HeaderProps) {
   return (
     // L'enveloppe garde la hauteur pleine dans le flux (pas de saut de contenu quand la barre se compacte) ;
     // elle laisse passer les clics, seule la barre les capte.
-    <header className="pointer-events-none sticky top-0 z-50 h-[var(--site-header-height)] shrink-0">
+    <header
+      className="pointer-events-none sticky top-0 z-50 h-[var(--site-header-height)] shrink-0"
+      style={{ viewTransitionName: "site-header" }}
+    >
       <div
-        className={`pointer-events-auto relative transition-[height,background-color,box-shadow,border-color] duration-300 motion-reduce:transition-none ${
+        // Un focus clavier dans le header le fait réapparaître.
+        onFocusCapture={() => setHidden(false)}
+        className={`pointer-events-auto relative transition-[height,background-color,box-shadow,border-color,translate] duration-500 ease-out-expo motion-reduce:transition-none ${
+          // Décalage supplémentaire pour sortir aussi l'ombre portée de l'écran.
+          hidden && !menuOpen ? "-translate-y-[calc(100%+2.5rem)]" : ""
+        } ${
           scrolled ? "h-[var(--site-header-height-compact)]" : "h-[var(--site-header-height)]"
         } ${
           transparent
@@ -132,10 +159,10 @@ export function Header({ overlay = false }: HeaderProps) {
             })}
             <Link
               href="/#contacts"
-              className={`ml-4 rounded-full px-[22px] py-[12px] text-[14.5px] font-semibold transition-colors ${
+              className={`btn-fill ml-4 rounded-full px-[22px] py-[12px] text-[14.5px] font-semibold transition-colors ${
                 transparent
-                  ? "bg-white text-ms-primary hover:bg-ms-mint"
-                  : "bg-ms-accent text-white hover:bg-ms-primary"
+                  ? "bg-white text-ms-primary [--btn-fill:var(--color-ms-mint)]"
+                  : "bg-ms-accent text-white"
               }`}
             >
               Nous contacter
@@ -171,17 +198,26 @@ export function Header({ overlay = false }: HeaderProps) {
           </button>
         </div>
 
+        <AnimatePresence>
         {menuOpen && (
-          <nav
+          <m.nav
             id="mobile-menu"
             aria-label="Menu principal"
+            initial={{ clipPath: "inset(0% 0% 100% 0%)" }}
+            animate={{ clipPath: "inset(0% 0% 0% 0%)", transition: { duration: 0.55, ease: EASE_IN_OUT_QUART } }}
+            exit={{ clipPath: "inset(0% 0% 100% 0%)", transition: { duration: 0.35, ease: EASE_IN_OUT_QUART } }}
             className="absolute inset-x-0 top-full max-h-[calc(100dvh-var(--site-header-height))] overflow-y-auto border-t border-ms-border bg-white px-5 pt-3 pb-6 shadow-[0_20px_40px_-30px_rgba(20,87,75,0.5)] sm:px-8 lg:hidden"
           >
-            <ul className="grid gap-1">
+            <m.ul
+              className="grid gap-1"
+              initial="hidden"
+              animate="visible"
+              variants={{ visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } } }}
+            >
               {NAV_LINKS.map((link) => {
                 const active = currentId === link.id;
                 return (
-                  <li key={link.href}>
+                  <m.li key={link.href} variants={MENU_ITEM}>
                     <Link
                       href={link.href}
                       onClick={closeMenu}
@@ -192,19 +228,20 @@ export function Header({ overlay = false }: HeaderProps) {
                     >
                       {link.label}
                     </Link>
-                  </li>
+                  </m.li>
                 );
               })}
-            </ul>
+            </m.ul>
             <Link
               href="/#contacts"
               onClick={closeMenu}
-              className="mt-4 block rounded-full bg-ms-accent px-[22px] py-[14px] text-center text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+              className="btn-fill mt-4 block rounded-full bg-ms-accent px-[22px] py-[14px] text-center text-[15px] font-semibold text-white"
             >
               Nous contacter
             </Link>
-          </nav>
+          </m.nav>
         )}
+        </AnimatePresence>
       </div>
     </header>
   );

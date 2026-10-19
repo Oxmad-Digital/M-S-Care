@@ -1,7 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ProductCategory } from "@prisma/client";
+import { AnimatePresence, m, useInView, type Variants } from "motion/react";
+import { RevealText } from "@/components/motion/Reveal";
+import { EASE_OUT_EXPO, VIEWPORT } from "@/components/motion/tokens";
 import type { CatalogueProduct } from "@/lib/types";
 import { ProductCard } from "./ProductCard";
 
@@ -13,6 +16,16 @@ const TABS: { key: ProductCategory | "all"; label: string }[] = [
 ];
 
 const PAGE_SIZE = 6;
+
+// Chaque carte arrive avec un léger décalage selon sa place dans son lot de PAGE_SIZE.
+const cardVariants: Variants = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: EASE_OUT_EXPO, delay: (i % PAGE_SIZE) * 0.07 },
+  }),
+};
 
 export function Catalogue({ products }: { products: CatalogueProduct[] }) {
   const [filter, setFilter] = useState<ProductCategory | "all">("all");
@@ -28,6 +41,8 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
   }, [products, filter, query]);
 
   const visible = filtered.slice(0, limit);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const gridInView = useInView(gridRef, VIEWPORT);
 
   return (
     <div>
@@ -37,7 +52,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
             Nos produits
           </p>
           <h2 className="max-w-[16ch] text-[32px] leading-[1.12] font-extrabold tracking-tight text-ms-primary sm:text-[48px]">
-            Des solutions pour le quotidien
+            <RevealText text="Des solutions pour le quotidien" />
           </h2>
         </div>
         <p className="text-[15.5px] leading-[1.75] text-ms-text-soft sm:text-[17px]">
@@ -59,12 +74,21 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
                   setFilter(tab.key);
                   setLimit(PAGE_SIZE);
                 }}
-                className={`rounded-full border px-[18px] py-[10px] text-sm font-semibold transition ${
+                className={`relative isolate rounded-full border px-[18px] py-[10px] text-sm font-semibold transition-colors duration-300 ${
                   active
-                    ? "border-ms-accent bg-ms-accent text-white"
+                    ? "border-ms-accent text-white"
                     : "border-ms-accent/28 bg-transparent text-ms-text hover:border-ms-accent hover:bg-white"
                 }`}
               >
+                {/* Pastille partagée qui glisse d'un onglet à l'autre. */}
+                {active && (
+                  <m.span
+                    layoutId="catalogue-tab"
+                    aria-hidden="true"
+                    className="absolute -inset-px -z-10 rounded-full bg-ms-accent"
+                    transition={{ type: "spring", bounce: 0.18, duration: 0.55 }}
+                  />
+                )}
                 {tab.label}
               </button>
             );
@@ -94,11 +118,28 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
           : `${filtered.length} ${filtered.length > 1 ? "produits" : "produit"}`}
       </p>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {visible.map((p) => (
-          <ProductCard key={p.id} product={p} />
-        ))}
-      </div>
+      <m.div
+        ref={gridRef}
+        initial="hidden"
+        animate={gridInView ? "visible" : "hidden"}
+        className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      >
+        <AnimatePresence mode="popLayout">
+          {visible.map((p, i) => (
+            <m.div
+              key={p.id}
+              layout
+              custom={i}
+              variants={cardVariants}
+              exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.25 } }}
+              transition={{ layout: { duration: 0.6, ease: EASE_OUT_EXPO } }}
+              className="flex"
+            >
+              <ProductCard product={p} />
+            </m.div>
+          ))}
+        </AnimatePresence>
+      </m.div>
 
       {filtered.length === 0 && (
         <div className="rounded-lg border border-dashed border-ms-accent/35 bg-white px-6 py-14 text-center">
@@ -116,7 +157,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
           <button
             type="button"
             onClick={() => setLimit(filtered.length)}
-            className="rounded-full bg-ms-accent px-[34px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+            className="btn-fill rounded-full bg-ms-accent px-[34px] py-[15px] text-[15px] font-semibold text-white"
           >
             Voir plus
           </button>

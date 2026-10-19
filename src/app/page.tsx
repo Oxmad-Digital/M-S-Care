@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import { prisma } from "@/lib/prisma";
 import { readDatabase } from "@/lib/database-read";
 import { Header } from "@/components/site/Header";
@@ -9,6 +10,7 @@ import { Catalogue } from "@/components/site/Catalogue";
 import { ContactSection } from "@/components/site/ContactSection";
 import { Footer } from "@/components/site/Footer";
 import { MaintenanceGate } from "@/components/site/MaintenanceGate";
+import { PAGE_TRANSITION } from "@/components/motion/page-transition";
 
 export const dynamic = "force-dynamic";
 
@@ -31,21 +33,23 @@ export default async function Home() {
   return (
     <MaintenanceGate>
       <Header overlay />
-      <main>
-        <Hero products={products} />
-        <About />
-        <ProductsIntro />
-        <Engagement />
-        <section
-          id="nosproduits"
-          className="border-t border-ms-border bg-ms-bg"
-        >
-          <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 sm:py-24 lg:px-14 lg:py-29">
-            <Catalogue products={products} />
-          </div>
-        </section>
-        <ContactSection />
-      </main>
+      <ViewTransition {...PAGE_TRANSITION}>
+        <main>
+          <Hero products={products} />
+          <About />
+          <ProductsIntro />
+          <Engagement />
+          <section
+            id="nosproduits"
+            className="border-t border-ms-border bg-ms-bg"
+          >
+            <div className="mx-auto max-w-[1280px] px-5 py-16 sm:px-8 sm:py-24 lg:px-14 lg:py-29">
+              <Catalogue products={products} />
+            </div>
+          </section>
+          <ContactSection />
+        </main>
+      </ViewTransition>
       <Footer />
     </MaintenanceGate>
   );

@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/site-settings";
+import { MotionProvider } from "@/components/motion/MotionProvider";
 
 // En maintenance, les visiteurs voient un écran d'attente ; les personnes connectées
 // à l'admin continuent de voir le site, avec un bandeau, pour pouvoir le vérifier.
 export async function MaintenanceGate({ children }: { children: React.ReactNode }) {
   const { maintenance, maintenanceMessage } = await getSiteSettings();
-  if (!maintenance) return children;
+  if (!maintenance) return <MotionProvider>{children}</MotionProvider>;
 
   if (await auth()) {
     return (
@@ -18,7 +19,7 @@ export async function MaintenanceGate({ children }: { children: React.ReactNode 
         >
           Mode maintenance actif — le site n’est visible que par l’équipe connectée.
         </Link>
-        {children}
+        <MotionProvider>{children}</MotionProvider>
       </>
     );
   }

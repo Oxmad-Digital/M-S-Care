@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, ViewTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { CATEGORY_LABEL, type CatalogueProduct } from "@/lib/types";
@@ -15,9 +15,10 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
   const imageUrl = imageForDosage(product, activeDosage);
   const activeNotice = activeDosage ? byDosage.get(activeDosage) : undefined;
   return (
-    <article className="animate-ms-rise">
+    <article>
       <Link
         href="/#nosproduits"
+        transitionTypes={["nav-back"]}
         className="group mb-9 inline-flex items-center gap-3 rounded-full text-sm font-semibold text-ms-accent transition-colors hover:text-ms-primary focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ms-accent sm:mb-11"
       >
         <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-ms-accent/20 bg-ms-accent/5 transition-colors duration-200 group-hover:border-ms-accent/40 group-hover:bg-ms-accent/10">
@@ -52,16 +53,18 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
               ))}
             </div>
           )}
-          <div className="relative aspect-square w-full max-w-[380px]">
-            <Image
-              key={imageUrl}
-              src={imageUrl}
-              alt={`Boîte de ${product.name} ${activeDosage ?? ""} M&S Care`}
-              fill
-              sizes="380px"
-              className="object-contain"
-            />
-          </div>
+          <ViewTransition name={`product-${product.id}`} share="morph" default="none">
+            <div className="relative aspect-square w-full max-w-[380px]">
+              <Image
+                key={imageUrl}
+                src={imageUrl}
+                alt={`Boîte de ${product.name} ${activeDosage ?? ""} M&S Care`}
+                fill
+                sizes="380px"
+                className={`object-contain ${productDosage ? "animate-ms-fade" : ""}`}
+              />
+            </div>
+          </ViewTransition>
         </div>
         <div>
           <p className="mb-3.5 text-xs font-bold tracking-[0.18em] text-ms-accent uppercase">
@@ -102,7 +105,7 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Consulter la notice du produit, dosage ${activeDosage}`}
-                className="rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+                className="btn-fill rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
               >
                 Consulter la notice du produit
               </a>
@@ -121,7 +124,7 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
                   rel="noopener noreferrer"
                   aria-label={description}
                   title={description}
-                  className="rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+                  className="btn-fill rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
                 >
                   Consulter la notice du produit
                 </a>

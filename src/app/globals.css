@@ -20,6 +20,10 @@
   --color-ms-badge: #e4f1ea;
   --color-ms-mint: #9fe3d2;
   --color-ms-border: rgba(40, 146, 128, 0.18);
+
+  /* Courbes du langage de mouvement (miroir de components/motion/tokens.ts). */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
 }
 
 html {
@@ -48,13 +52,121 @@ body {
   animation: ms-rise 700ms ease-out both;
 }
 
+@keyframes ms-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+.animate-ms-fade {
+  animation: ms-fade 400ms ease-out both;
+}
+
+/* Jauge qui se remplit pendant l'affichage d'un produit du hero. */
+@keyframes ms-progress {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+.animate-ms-progress {
+  transform-origin: left;
+  animation: ms-progress 5s linear both;
+}
+
+/* Bouton dont la couleur de survol monte depuis le bas. Couleur : --btn-fill. */
+.btn-fill {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.btn-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: var(--btn-fill, var(--color-ms-primary));
+  transform: translateY(101%);
+  transition: transform 550ms var(--ease-out-expo);
+}
+
+.btn-fill:hover::before,
+.btn-fill:focus-visible::before {
+  transform: none;
+}
+
+.btn-fill:disabled::before {
+  display: none;
+}
+
+/* Transitions entre pages (React <ViewTransition>). */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+
+::view-transition-group(.morph) {
+  animation-duration: 600ms;
+  animation-timing-function: var(--ease-out-expo);
+}
+
+::view-transition-old(.nav-forward) {
+  --slide-offset: -48px;
+  animation:
+    180ms ease-in both ms-vt-fade reverse,
+    450ms var(--ease-in-out-quart) both ms-vt-slide reverse;
+}
+
+::view-transition-new(.nav-forward) {
+  --slide-offset: 48px;
+  animation:
+    260ms ease-out 160ms both ms-vt-fade,
+    450ms var(--ease-in-out-quart) both ms-vt-slide;
+}
+
+::view-transition-old(.nav-back) {
+  --slide-offset: 48px;
+  animation:
+    180ms ease-in both ms-vt-fade reverse,
+    450ms var(--ease-in-out-quart) both ms-vt-slide reverse;
+}
+
+::view-transition-new(.nav-back) {
+  --slide-offset: -48px;
+  animation:
+    260ms ease-out 160ms both ms-vt-fade,
+    450ms var(--ease-in-out-quart) both ms-vt-slide;
+}
+
+@keyframes ms-vt-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes ms-vt-slide {
+  from {
+    translate: var(--slide-offset);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
   }
 
-  .animate-ms-rise {
+  .animate-ms-rise,
+  .animate-ms-fade,
+  .animate-ms-progress {
     animation: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 
   *,

@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
+import { m } from "motion/react";
 import { submitContactForm, type ContactFormState } from "@/lib/actions/contact";
 
 const initialState: ContactFormState = { status: "idle" };
 
 const inputClass =
-  "h-12 w-full rounded-md border border-ms-accent/24 bg-white px-[15px] text-[15px] text-ms-ink outline-none focus:border-ms-accent";
+  "h-12 w-full rounded-md border border-ms-accent/24 bg-white px-[15px] text-[15px] text-ms-ink outline-none transition-[border-color,box-shadow] duration-300 focus:border-ms-accent focus:shadow-[0_0_0_4px_rgba(40,146,128,0.12)]";
 
 export function ContactForm() {
   const [state, formAction, pending] = useActionState(
@@ -62,23 +63,32 @@ export function ContactForm() {
           rows={5}
           placeholder="Message"
           required
-          className="resize-vertical rounded-md border border-ms-accent/24 bg-white px-[15px] py-[13px] text-[15px] leading-[1.6] text-ms-ink outline-none focus:border-ms-accent"
+          className="resize-vertical rounded-md border border-ms-accent/24 bg-white px-[15px] py-[13px] text-[15px] leading-[1.6] text-ms-ink outline-none transition-[border-color,box-shadow] duration-300 focus:border-ms-accent focus:shadow-[0_0_0_4px_rgba(40,146,128,0.12)]"
         />
       </label>
       <button
         type="submit"
         disabled={pending}
-        className="mt-1 h-13 rounded-full bg-ms-accent text-[15.5px] font-semibold text-white transition hover:bg-ms-primary disabled:opacity-60"
+        className="btn-fill mt-1 h-13 rounded-full bg-ms-accent text-[15.5px] font-semibold text-white transition-opacity disabled:opacity-60"
       >
         {pending ? "Envoi..." : "Envoyer"}
       </button>
       {state.status === "success" && (
-        <p className="text-sm font-semibold text-ms-accent">
+        <m.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex items-center gap-2.5 text-sm font-semibold text-ms-accent"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 flex-none fill-none stroke-current" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <m.path d="M5 12.5 9.5 17 19 7" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.5, delay: 0.15 }} />
+          </svg>
           Merci, votre message a bien été pris en compte.
-        </p>
+        </m.p>
       )}
       {state.status === "error" && (
-        <p className="text-sm font-semibold text-red-600">{state.error}</p>
+        <m.p initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="text-sm font-semibold text-red-600">
+          {state.error}
+        </m.p>
       )}
     </form>
   );
