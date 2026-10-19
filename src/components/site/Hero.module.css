@@ -1,0 +1,37 @@
+.hero {
+  min-height: calc(100vh - var(--site-header-height));
+  min-height: calc(100dvh - var(--site-header-height));
+}
+
+.content {
+  padding-block: clamp(2rem, 6vh, 6rem);
+  padding-block: clamp(2rem, 6dvh, 6rem);
+}
+
+.image {
+  object-fit: cover;
+  object-position: 64% 35%;
+  transform: scale(1.12) translateX(5%);
+}
+
+.overlay {
+  background: linear-gradient(
+    90deg,
+    rgb(11 47 41 / 94%) 0%,
+    rgb(11 47 41 / 84%) 30%,
+    rgb(11 47 41 / 30%) 65%,
+    rgb(11 47 41 / 8%) 100%
+  );
+}
+
+.title {
+  font-size: clamp(2.5rem, 5.5vw, 4.75rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+@media (max-width: 639px) {
+  .overlay {
+    background: linear-gradient(90deg, rgb(11 47 41 / 94%), rgb(11 47 41 / 65%));
+  }
+}

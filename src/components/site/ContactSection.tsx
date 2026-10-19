@@ -3,8 +3,8 @@ import { ContactForm } from "@/components/site/ContactForm";
 export function ContactSection() {
   return (
     <section id="contacts" className="border-t border-ms-border bg-white">
-      <div className="mx-auto max-w-[1280px] px-5 py-18 sm:px-8 sm:py-24 lg:px-14 lg:py-33">
-        <div className="grid grid-cols-1 items-start gap-10 sm:grid-cols-2 sm:gap-22">
+      <div className="mx-auto max-w-[1280px] px-5 py-18 sm:px-8 sm:py-24 lg:px-14">
+        <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2 lg:gap-22">
           <div>
             <p className="mb-[18px] text-xs font-bold tracking-[0.18em] text-ms-accent uppercase">
               Contacts
@@ -13,10 +13,8 @@ export function ContactSection() {
               Nous contacter
             </h2>
             <p className="mb-9 max-w-[46ch] text-[15.5px] leading-[1.75] text-ms-text-soft sm:text-[17px]">
-              Une question sur nos produits ou besoin d&rsquo;informations
-              complémentaires ? Notre équipe est à votre écoute. Remplissez le
-              formulaire ci-dessous et nous vous répondrons dans les plus
-              brefs délais.
+              Une question sur la gamme ou un besoin professionnel ?
+              Parlez-nous de votre demande, notre équipe est à votre écoute.
             </p>
             <div className="grid gap-6 border-t border-ms-accent/20 pt-[26px]">
               <div>

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { Modal } from "@/components/admin/Modal";
 import { ProductForm } from "@/components/admin/ProductForm";
+import { ProductsList } from "@/components/admin/ProductsList";
+import { getProductForEdit } from "@/lib/admin-products";
 import { updateProduct } from "@/lib/actions/products";
 
 export const dynamic = "force-dynamic";
@@ -11,21 +13,18 @@ export default async function EditProductPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const product = await prisma.product.findUnique({
-    where: { id },
-    include: { notices: { orderBy: { position: "asc" } } },
-  });
+  const product = await getProductForEdit(id);
 
   if (!product) {
     notFound();
   }
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-extrabold text-ms-primary">
-        Modifier {product.name}
-      </h1>
-      <ProductForm action={updateProduct.bind(null, product.id)} product={product} />
-    </div>
+    <>
+      <ProductsList />
+      <Modal title={`Modifier ${product.name}`}>
+        <ProductForm action={updateProduct.bind(null, product.id)} product={product} />
+      </Modal>
+    </>
   );
 }

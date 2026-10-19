@@ -1,0 +1,158 @@
+{
+  "source": "https://mandscare.com/",
+  "retrievedAt": "2026-10-18",
+  "products": [
+    {
+      "slug": "amdicare",
+      "name": "AmdiCare",
+      "variants": [
+        {
+          "dosage": "5mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/jpshCEsiHlKlaKns6gWyuoxOM.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "10mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/cLgLzXzfTdbe8LFiwbQPJuZD1OY.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "aldacare",
+      "name": "Aldacare",
+      "variants": [
+        {
+          "dosage": "200mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/FF0ZlCsYfCZQrvcevI3k6EZ6Ro.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "400mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/v48wSbAoqUlzMYNIOtQi8aEgCqw.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "cefixcare",
+      "name": "Cefixcare",
+      "variants": [
+        {
+          "dosage": "40mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/EVcy8FhQmR2YMe35XDYv6VGuBAE.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "100mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/zlTXNAK7BLoNQvNAa6E51OOxkE.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "200mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/5W5vu6vVQDadV5l8USFvNwh4Aqw.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "fizzcare-paracetamol",
+      "name": "Fizzcare paracetamol",
+      "variants": [
+        {
+          "dosage": "500mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/SsjmebBSPh66baV4vCRBEJqfl2o.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "1000mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/ObKCpWBviFK5Ht7iTpgacd3qSfE.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "ibucare",
+      "name": "Ibucare",
+      "variants": [
+        {
+          "dosage": "100mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/5U7R2OG37BJUGdOx4x1rObGnE.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "200mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/sgm0gtOr8IW7o3K80lcbjmZ3c.png?width=1152&height=864"
+        },
+        {
+          "dosage": "400mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/c8mXhHS1IF9YeRFHnxv34JaF4Jo.png?width=1152&height=864"
+        }
+      ]
+    },
+    {
+      "slug": "metrocare",
+      "name": "Metrocare",
+      "variants": [
+        {
+          "dosage": "125mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/fbWJdgnq9sEkBgxpPNoPvyVdvs.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "250mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/gge1UKZn26DmB90rFcCLQKPI.png?width=1152&height=864"
+        }
+      ]
+    },
+    {
+      "slug": "paracare",
+      "name": "Paracare",
+      "variants": [
+        {
+          "dosage": "10mg/ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/ogUZZbv8Ns9qqECpIruLjtU0eEA.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "125mg/5ml",
+          "sourceImageUrl": "https://framerusercontent.com/images/BnUF6ICKLMgIQwNre4cQyak8cU.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "prednicare",
+      "name": "Prednicare",
+      "variants": [
+        {
+          "dosage": "5mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/s41p4y8hdTmDlzxgGntSX0h7U.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "20mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/VTNsIrVYgfBdkv1jFBBLwsbpWHA.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "vastacare",
+      "name": "Vastacare",
+      "variants": [
+        {
+          "dosage": "10mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/RJV5HYT8wctGTlYpOH7F15Ujwtk.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "20mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/MVI2jhjj53uIeSUIegm2bdlVfhk.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "40mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/xSP1LbMfiNudx7kVYToDa7BE0Yw.png?width=4000&height=4000"
+        }
+      ]
+    },
+    {
+      "slug": "fizzcare-vitamine-c",
+      "name": "Fizzcare vitamine C",
+      "variants": [
+        {
+          "dosage": "500mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/JuaTCOXREU3KyOFcEks1StJyLdc.png?width=4000&height=4000"
+        },
+        {
+          "dosage": "1000mg",
+          "sourceImageUrl": "https://framerusercontent.com/images/7bb1RE6VuIZEqmZqhmEK2SFFCiM.png?width=4000&height=4000"
+        }
+      ]
+    }
+  ]
+}

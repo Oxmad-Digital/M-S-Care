@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { UploadButton } from "./UploadButton";
 
 type NoticeRow = { key: string; label: string; url: string };
 
@@ -27,7 +28,7 @@ export function NoticesField({
   return (
     <fieldset className="grid gap-2.5">
       <legend className="mb-1.5 text-[13px] font-semibold text-ms-text">
-        Notices
+        Autres notices (non liées à un dosage)
       </legend>
 
       {rows.length === 0 && (
@@ -37,13 +38,13 @@ export function NoticesField({
       {rows.map((row) => (
         <div
           key={row.key}
-          className="grid grid-cols-1 gap-2 sm:grid-cols-[180px_1fr_auto]"
+          className="grid grid-cols-1 items-start gap-2 sm:grid-cols-[180px_1fr_auto_auto]"
         >
           <input
             name="noticeLabel"
             type="text"
             required
-            placeholder="Notice 200 mg"
+            placeholder="Notice générale"
             aria-label="Libellé de la notice"
             value={row.label}
             onChange={(e) => updateRow(row.key, { label: e.target.value })}
@@ -58,6 +59,11 @@ export function NoticesField({
             value={row.url}
             onChange={(e) => updateRow(row.key, { url: e.target.value })}
             className={fieldClass}
+          />
+          <UploadButton
+            kind="notices"
+            accept="application/pdf"
+            onUploaded={(url) => updateRow(row.key, { url })}
           />
           <button
             type="button"

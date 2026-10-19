@@ -17,7 +17,7 @@ export function ContactForm() {
   return (
     <form
       action={formAction}
-      className="grid gap-[18px] rounded-lg border border-ms-accent/18 bg-ms-bg p-6 sm:p-11"
+      className="grid gap-[18px] rounded-2xl border border-ms-accent/18 bg-ms-bg p-6 sm:p-9"
     >
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <label className="grid gap-2">
@@ -47,7 +47,7 @@ export function ContactForm() {
         </span>
         <select name="subject" required defaultValue="" className={inputClass}>
           <option value="" disabled>
-            Select…
+            Sélectionnez un objet
           </option>
           <option>Service commercial</option>
           <option>Service commande</option>

@@ -4,12 +4,18 @@ import { neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 
 neonConfig.webSocketConstructor = ws;
+// Les requêtes simples passent par HTTPS ; les transactions conservent
+// une connexion WebSocket dédiée via le même adaptateur.
+neonConfig.poolQueryViaFetch = true;
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const adapter = new PrismaNeon({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaNeon({
+  connectionString: process.env.DATABASE_URL,
+  connectionTimeoutMillis: 10_000,
+});
 
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({ adapter });
 

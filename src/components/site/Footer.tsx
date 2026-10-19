@@ -1,15 +1,17 @@
 import Image from "next/image";
+import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "#apropos", label: "A propos" },
-  { href: "#nosproduits", label: "Nos produits" },
-  { href: "#contacts", label: "Contacts" },
+  { href: "/#nosproduits", label: "Nos produits" },
+  { href: "/#apropos", label: "Le laboratoire" },
+  { href: "/#engagement", label: "Nos engagements" },
+  { href: "/#contacts", label: "Contacts" },
   { href: "#", label: "Mentions légales" },
 ];
 
 export function Footer() {
   return (
-    <footer className="bg-ms-primary text-white">
+    <footer className="bg-ms-primary-dark text-white">
       <div className="mx-auto max-w-[1280px] px-5 pt-14 pb-8 sm:px-8 sm:pt-23 lg:px-14">
         <div className="grid grid-cols-1 items-start gap-8 sm:grid-cols-3 sm:gap-16">
           <div>
@@ -31,13 +33,13 @@ export function Footer() {
             </p>
             <div className="grid justify-items-start gap-[11px]">
               {NAV_LINKS.map((link) => (
-                <a
+                <Link
                   key={link.label}
                   href={link.href}
                   className="text-[15px] text-white/86 transition hover:text-[#8FD3BE]"
                 >
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>

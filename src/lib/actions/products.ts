@@ -4,13 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProductCategory } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-
-function parseDosages(raw: string): string[] {
-  return raw
-    .split(",")
-    .map((d) => d.trim())
-    .filter(Boolean);
-}
+import { normalizeDosage } from "@/lib/product-variants";
 
 function slugify(name: string): string {
   return name
@@ -21,70 +15,129 @@ function slugify(name: string): string {
     .replace(/(^-|-$)/g, "");
 }
 
+// Un produit dupliqué peut garder le même nom : on suffixe le slug pour qu'il reste unique.
+async function uniqueSlug(name: string) {
+  const base = slugify(name);
+  for (let n = 1; ; n++) {
+    const slug = n === 1 ? base : `${base}-${n}`;
+    if (!(await prisma.product.findUnique({ where: { slug }, select: { id: true } }))) return slug;
+  }
+}
+
 function readProductFields(formData: FormData) {
   return {
     name: String(formData.get("name") ?? "").trim(),
     category: String(formData.get("category") ?? "") as ProductCategory,
     principeActif: String(formData.get("principeActif") ?? "").trim(),
-    dosages: parseDosages(String(formData.get("dosages") ?? "")),
     forme: String(formData.get("forme") ?? "").trim(),
     conditionnement: String(formData.get("conditionnement") ?? "").trim(),
     classe: String(formData.get("classe") ?? "").trim(),
     indications: String(formData.get("indications") ?? "").trim(),
     flavor: String(formData.get("flavor") ?? "").trim() || null,
-    imageUrl: String(formData.get("imageUrl") ?? "").trim(),
     published: formData.get("published") === "on",
   };
 }
 
-function readNotices(formData: FormData) {
-  const labels = formData.getAll("noticeLabel").map((v) => String(v).trim());
-  const urls = formData.getAll("noticeUrl").map((v) => String(v).trim());
+// Chaque ligne « dosage » porte son image et sa notice (optionnelles) ; les notices
+// de dosage prennent le dosage comme libellé, ce qui les relie sur la fiche produit.
+function readDosages(formData: FormData) {
+  const labels = formData.getAll("dosage").map((value) => String(value).trim());
+  const images = formData.getAll("dosageImageUrl").map((value) => String(value).trim());
+  const noticeUrls = formData.getAll("dosageNoticeUrl").map((value) => String(value).trim());
+  const rows = labels
+    .map((dosage, index) => ({ dosage, imageUrl: images[index] ?? "", noticeUrl: noticeUrls[index] ?? "" }))
+    .filter((row) => row.dosage);
 
-  return urls
-    .map((url, index) => ({ label: labels[index] || "Notice", url }))
-    .filter((notice) => notice.url)
-    .map((notice, position) => ({ ...notice, position }));
+  const seen = new Set<string>();
+  for (const { dosage } of rows) {
+    if (seen.has(normalizeDosage(dosage))) throw new Error(`Le dosage « ${dosage} » est saisi deux fois.`);
+    seen.add(normalizeDosage(dosage));
+  }
+
+  const otherLabels = formData.getAll("noticeLabel").map((v) => String(v).trim());
+  const otherNotices = formData
+    .getAll("noticeUrl")
+    .map((v, index) => ({ label: otherLabels[index] || "Notice", url: String(v).trim() }))
+    .filter((notice) => notice.url);
+
+  // L'image du produit est celle du premier dosage (ou le champ unique s'il n'y a aucun dosage).
+  const imageUrl = rows.length ? rows[0].imageUrl : String(formData.get("imageUrl") ?? "").trim();
+  if (!imageUrl) throw new Error("L’image du premier dosage est obligatoire.");
+
+  return {
+    imageUrl,
+    dosages: rows.map((row) => row.dosage),
+    variants: rows
+      .filter((row) => row.imageUrl)
+      .map((row, position) => ({ dosage: row.dosage, imageUrl: row.imageUrl, position })),
+    notices: [
+      ...rows.filter((row) => row.noticeUrl).map((row) => ({ label: row.dosage, url: row.noticeUrl })),
+      ...otherNotices,
+    ].map((notice, position) => ({ ...notice, position })),
+  };
 }
 
 export async function createProduct(formData: FormData) {
   const fields = readProductFields(formData);
-  const notices = readNotices(formData);
-  const slug = slugify(fields.name);
+  const { imageUrl, dosages, variants, notices } = readDosages(formData);
+  const slug = await uniqueSlug(fields.name);
 
   const count = await prisma.product.count();
 
   await prisma.product.create({
-    data: { ...fields, slug, order: count, notices: { create: notices } },
+    data: { ...fields, imageUrl, dosages, slug, order: count, notices: { create: notices }, variants: { create: variants } },
   });
 
-  revalidatePath("/");
-  revalidatePath("/admin/produits");
-  redirect("/admin/produits");
+  revalidateProducts();
+  redirect("/admin/produits?ok=cree");
 }
 
 export async function updateProduct(id: string, formData: FormData) {
   const fields = readProductFields(formData);
-  const notices = readNotices(formData);
+  const { imageUrl, dosages, variants, notices } = readDosages(formData);
 
   await prisma.product.update({
     where: { id },
-    data: { ...fields, notices: { deleteMany: {}, create: notices } },
+    data: { ...fields, imageUrl, dosages, notices: { deleteMany: {}, create: notices }, variants: { deleteMany: {}, create: variants } },
   });
 
-  revalidatePath("/");
-  revalidatePath("/admin/produits");
-  redirect("/admin/produits");
+  revalidateProducts();
+  redirect("/admin/produits?ok=modifie");
 }
 
-export async function deleteProduct(id: string) {
-  await prisma.product.delete({ where: { id } });
+function revalidateProducts() {
   revalidatePath("/");
+  revalidatePath("/produits/[slug]", "page");
   revalidatePath("/admin/produits");
 }
 
-export async function toggleProductPublished(id: string, published: boolean) {
-  await prisma.product.update({ where: { id }, data: { published } });
-  revalidatePath("/");
-  revalidatePath("/admin/produits");
+export async function deleteProducts(ids: string[]) {
+  await prisma.product.deleteMany({ where: { id: { in: ids } } });
+  revalidateProducts();
+}
+
+export async function setProductsPublished(ids: string[], published: boolean) {
+  await prisma.product.updateMany({ where: { id: { in: ids } }, data: { published } });
+  revalidateProducts();
+}
+
+// Échange le produit avec son voisin, puis renumérote tout le catalogue pour
+// effacer les doublons éventuels de `order`.
+export async function moveProduct(id: string, direction: "up" | "down") {
+  const products = await prisma.product.findMany({
+    orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+    select: { id: true, order: true },
+  });
+  const index = products.findIndex((product) => product.id === id);
+  const target = direction === "up" ? index - 1 : index + 1;
+  if (index < 0 || target < 0 || target >= products.length) return;
+
+  [products[index], products[target]] = [products[target], products[index]];
+  await prisma.$transaction(
+    products
+      .map((product, order) => ({ ...product, newOrder: order }))
+      .filter((product) => product.order !== product.newOrder)
+      .map((product) => prisma.product.update({ where: { id: product.id }, data: { order: product.newOrder } })),
+  );
+  revalidateProducts();
 }

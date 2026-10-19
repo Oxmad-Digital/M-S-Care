@@ -9,9 +9,9 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
-  title: "M&S Care — Acteur de la santé pour tous",
+  title: "M&S Care | Acteur de la santé pour tous",
   description:
-    "M&S Care développe des solutions de santé fiables et accessibles, pensées pour les réalités du terrain à Madagascar.",
+    "M&S Care est un laboratoire pharmaceutique dédié à la santé du quotidien à Madagascar.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

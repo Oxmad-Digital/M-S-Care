@@ -2,11 +2,11 @@ import Image from "next/image";
 
 export function ProductsIntro() {
   return (
-    <section className="bg-ms-primary text-white">
+    <section id="presentation-produits" aria-labelledby="products-intro-title" className="bg-ms-primary text-white">
       <div className="mx-auto max-w-[1280px] px-5 py-18 sm:px-8 sm:py-24 lg:px-14 lg:py-33">
         <div className="grid grid-cols-1 items-end gap-9 sm:grid-cols-2 sm:gap-20">
           <div>
-            <h2 className="mb-[26px] text-[32px] leading-[1.08] font-extrabold tracking-tight text-white sm:text-[54px]">
+            <h2 id="products-intro-title" className="mb-[26px] text-[32px] leading-[1.08] font-extrabold tracking-tight text-white sm:text-[54px]">
               Nos produits
             </h2>
             <p className="mb-5 text-[15.5px] leading-[1.75] text-white/80 sm:text-[17px]">

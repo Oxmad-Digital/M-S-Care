@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { readDatabase } from "@/lib/database-read";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { About } from "@/components/site/About";
@@ -11,16 +12,20 @@ import { Footer } from "@/components/site/Footer";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const products = await prisma.product.findMany({
+  const products = await readDatabase(() => prisma.product.findMany({
     where: { published: true },
     orderBy: { order: "asc" },
     include: {
+      variants: {
+        orderBy: { position: "asc" },
+        select: { dosage: true, imageUrl: true },
+      },
       notices: {
         orderBy: { position: "asc" },
         select: { id: true, label: true, url: true },
       },
     },
-  });
+  }));
 
   return (
     <>

@@ -1,6 +1,8 @@
-import type { Notice, Product } from "@prisma/client";
+import type { Notice, Product, ProductVariant } from "@prisma/client";
 import { ProductCategory } from "@prisma/client";
 import { NoticesField } from "./NoticesField";
+import { DosagesField } from "./DosagesField";
+import { matchDosageNotices, normalizeDosage } from "@/lib/product-variants";
 
 const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
   { value: ProductCategory.MEDICAMENT, label: "Medicaments" },
@@ -11,25 +13,51 @@ const CATEGORY_OPTIONS: { value: ProductCategory; label: string }[] = [
 const fieldClass =
   "h-11 rounded-md border border-ms-accent/24 px-3 text-[15px] outline-none focus:border-ms-accent";
 
+function TextField({
+  name,
+  label,
+  defaultValue,
+  required = true,
+}: {
+  name: string;
+  label: string;
+  defaultValue?: string | null;
+  required?: boolean;
+}) {
+  return (
+    <label className="grid gap-1.5">
+      <span className="text-[13px] font-semibold text-ms-text">{label}</span>
+      <input
+        name={name}
+        type="text"
+        required={required}
+        defaultValue={defaultValue ?? ""}
+        className={fieldClass}
+      />
+    </label>
+  );
+}
+
 export function ProductForm({
   action,
   product,
 }: {
   action: (formData: FormData) => void;
-  product?: Product & { notices: Notice[] };
+  product?: Product & { notices: Notice[]; variants: ProductVariant[] };
 }) {
+  const { byDosage, otherNotices } = matchDosageNotices(product ?? { dosages: [], notices: [] });
+  const dosages = (product?.dosages ?? []).map((dosage, index) => ({
+    dosage,
+    // L'image du produit est celle du premier dosage.
+    imageUrl:
+      product?.variants.find((v) => normalizeDosage(v.dosage) === normalizeDosage(dosage))?.imageUrl ??
+      (index === 0 ? product?.imageUrl ?? "" : ""),
+    noticeUrl: byDosage.get(dosage)?.url ?? "",
+  }));
+
   return (
-    <form action={action} className="grid max-w-2xl gap-5">
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">Nom</span>
-        <input
-          name="name"
-          type="text"
-          required
-          defaultValue={product?.name}
-          className={fieldClass}
-        />
-      </label>
+    <form action={action} className="grid gap-5 sm:grid-cols-2">
+      <TextField name="name" label="Nom" defaultValue={product?.name} />
 
       <label className="grid gap-1.5">
         <span className="text-[13px] font-semibold text-ms-text">Catégorie</span>
@@ -47,69 +75,12 @@ export function ProductForm({
         </select>
       </label>
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          Principe actif
-        </span>
-        <input
-          name="principeActif"
-          type="text"
-          required
-          defaultValue={product?.principeActif}
-          className={fieldClass}
-        />
-      </label>
+      <TextField name="principeActif" label="Principe actif" defaultValue={product?.principeActif} />
+      <TextField name="classe" label="Classe" defaultValue={product?.classe} />
+      <TextField name="forme" label="Forme" defaultValue={product?.forme} />
+      <TextField name="conditionnement" label="Conditionnement" defaultValue={product?.conditionnement} />
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          Dosages (séparés par des virgules)
-        </span>
-        <input
-          name="dosages"
-          type="text"
-          required
-          placeholder="5mg, 10mg"
-          defaultValue={product?.dosages.join(", ")}
-          className={fieldClass}
-        />
-      </label>
-
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">Forme</span>
-        <input
-          name="forme"
-          type="text"
-          required
-          defaultValue={product?.forme}
-          className={fieldClass}
-        />
-      </label>
-
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          Conditionnement
-        </span>
-        <input
-          name="conditionnement"
-          type="text"
-          required
-          defaultValue={product?.conditionnement}
-          className={fieldClass}
-        />
-      </label>
-
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">Classe</span>
-        <input
-          name="classe"
-          type="text"
-          required
-          defaultValue={product?.classe}
-          className={fieldClass}
-        />
-      </label>
-
-      <label className="grid gap-1.5">
+      <label className="grid gap-1.5 sm:col-span-2">
         <span className="text-[13px] font-semibold text-ms-text">
           Indications
         </span>
@@ -122,35 +93,9 @@ export function ProductForm({
         />
       </label>
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          Goût / saveur (optionnel)
-        </span>
-        <input
-          name="flavor"
-          type="text"
-          defaultValue={product?.flavor ?? ""}
-          className={fieldClass}
-        />
-      </label>
+      <TextField name="flavor" label="Goût / saveur (optionnel)" defaultValue={product?.flavor} required={false} />
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">
-          URL de l&rsquo;image
-        </span>
-        <input
-          name="imageUrl"
-          type="text"
-          required
-          placeholder="/images/products/mon-produit.png"
-          defaultValue={product?.imageUrl}
-          className={fieldClass}
-        />
-      </label>
-
-      <NoticesField notices={product?.notices ?? []} />
-
-      <label className="flex items-center gap-2.5">
+      <label className="flex items-center gap-2.5 self-end sm:h-11">
         <input
           name="published"
           type="checkbox"
@@ -161,6 +106,14 @@ export function ProductForm({
           Publié sur le site
         </span>
       </label>
+
+      <div className="sm:col-span-2">
+        <DosagesField dosages={dosages} imageUrl={product?.imageUrl} />
+      </div>
+
+      <div className="sm:col-span-2">
+        <NoticesField notices={otherNotices} />
+      </div>
 
       <button
         type="submit"

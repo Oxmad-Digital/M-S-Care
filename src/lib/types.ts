@@ -14,10 +14,11 @@ export type CatalogueProduct = {
   flavor: string | null;
   imageUrl: string;
   notices: { id: string; label: string; url: string }[];
+  variants: { dosage: string; imageUrl: string }[];
 };
 
 export const CATEGORY_LABEL: Record<ProductCategory, string> = {
-  MEDICAMENT: "Medicaments",
-  OTC: "Medicaments (OTC)",
-  SUPPLEMENT: "Compléments alimentaire",
+  MEDICAMENT: "Médicaments",
+  OTC: "Médicaments (OTC)",
+  SUPPLEMENT: "Compléments alimentaires",
 };

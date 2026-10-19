@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+:root {
+  --site-header-height: 5rem;
+}
+
 @theme inline {
   --font-sans: var(--font-montserrat);
 
@@ -11,7 +15,7 @@
   --color-ms-ink: #17342e;
   --color-ms-text: #3d5a53;
   --color-ms-text-soft: #4a6660;
-  --color-ms-text-muted: #8aa9a1;
+  --color-ms-text-muted: #526e65;
   --color-ms-badge: #e4f1ea;
   --color-ms-mint: #9fe3d2;
   --color-ms-border: rgba(40, 146, 128, 0.18);
@@ -19,6 +23,7 @@
 
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--site-header-height);
 }
 
 body {
@@ -40,4 +45,20 @@ body {
 
 .animate-ms-rise {
   animation: ms-rise 700ms ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-ms-rise {
+    animation: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
 }

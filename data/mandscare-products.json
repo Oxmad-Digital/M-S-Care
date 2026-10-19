@@ -1,0 +1,332 @@
+{
+  "source": "https://mandscare.com/",
+  "retrievedAt": "2026-10-18",
+  "products": [
+    {
+      "slug": "ketocare",
+      "name": "Ketocare",
+      "category": "MEDICAMENT",
+      "principeActif": "Ketoconazole BP",
+      "forme": "Crème",
+      "conditionnement": "Tube de 20g",
+      "classe": "Antifongique de la classe des imidazolés",
+      "indications": "Dermatophytoses cutanées, candidoses cutanées et pityriasis versicolor",
+      "flavor": null,
+      "dosages": [
+        "2%"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "ketocare",
+      "sourceImageUrl": "https://framerusercontent.com/images/TUNBZuLEXaC0paKcE1NM9lU5Av0.png?width=4000&height=4000"
+    },
+    {
+      "slug": "kofcarephyto-pastille",
+      "name": "KofcarePhyto pastille",
+      "category": "OTC",
+      "principeActif": "Plantes Ayurvédiques",
+      "forme": "Pastilles",
+      "conditionnement": "Boîte de 24",
+      "classe": "",
+      "indications": "Toux et gorge",
+      "flavor": "Goût menthe, orange et citron",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "kofcarephyto-pastille",
+      "sourceImageUrl": "https://framerusercontent.com/images/VxgfjKm8hZojizYxdHQnnHTZ6c.png?width=4000&height=4000"
+    },
+    {
+      "slug": "kofcarephyto-sirop",
+      "name": "KofcarePhyto sirop",
+      "category": "OTC",
+      "principeActif": "Plantes Ayurvédiques",
+      "forme": "Suspension buvable",
+      "conditionnement": "Flacon de 100ml",
+      "classe": "",
+      "indications": "Toux et gorge",
+      "flavor": null,
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "kofcarephyto-pastille-copy",
+      "sourceImageUrl": "https://framerusercontent.com/images/0oTgj0CapFhCDw3Vl7XQEA20pI.png?width=4000&height=4000"
+    },
+    {
+      "slug": "losarcare",
+      "name": "Losarcare",
+      "category": "MEDICAMENT",
+      "principeActif": "Losartan potassium BP",
+      "forme": "Comprimé pelliculé",
+      "conditionnement": "Boîte de 3×10",
+      "classe": "Antihypertenseur",
+      "indications": "Hypertension artérielle et protection rénale chez les patients diabétiques type 2 hypertendus",
+      "flavor": null,
+      "dosages": [
+        "50mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "losarcare",
+      "sourceImageUrl": "https://framerusercontent.com/images/qggO8HOafFg7izvnY7Xnri5E8.png?width=4000&height=4000"
+    },
+    {
+      "slug": "losarcareh",
+      "name": "LosarcareH",
+      "category": "MEDICAMENT",
+      "principeActif": "Losartan potassium et hydrochlorothiazide",
+      "forme": "Comprimés pelliculés",
+      "conditionnement": "Boîte de 3×10",
+      "classe": "Antihypertenseur",
+      "indications": "Hypertension artérielle essentielle",
+      "flavor": null,
+      "dosages": [
+        "50mg/12,5 mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "losacareh",
+      "sourceImageUrl": "https://framerusercontent.com/images/Gkx5nqVfBYJS3xraAVtYce8UvI.png?width=4000&height=4000"
+    },
+    {
+      "slug": "metrocare",
+      "name": "Metrocare",
+      "category": "MEDICAMENT",
+      "principeActif": "Metronidazole BP",
+      "forme": "Suspension buvable et comprimé pelliculé",
+      "conditionnement": "Flacon de 100ml et boite de 10×10",
+      "classe": "Antibactérien de la famille des imidazolés, antiparasitaire",
+      "indications": "Infections digestives et intestinales, infections génito-urinaires, infections dentaires et post-opératoires",
+      "flavor": "Ananas",
+      "dosages": [
+        "125mg/5ml",
+        "250mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "metrocare",
+      "sourceImageUrl": "https://framerusercontent.com/images/fbWJdgnq9sEkBgxpPNoPvyVdvs.png?width=4000&height=4000"
+    },
+    {
+      "slug": "ofloxcare",
+      "name": "Ofloxcare",
+      "category": "MEDICAMENT",
+      "principeActif": "Ofloxacine",
+      "forme": "Comprimé pelliculé",
+      "conditionnement": "Boîte de 1×10",
+      "classe": "Antibactérien de la famille des fluoroquinolones",
+      "indications": "Infections à germes sensibles",
+      "flavor": null,
+      "dosages": [
+        "200mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "ofloxcare",
+      "sourceImageUrl": "https://framerusercontent.com/images/C8WkTHG4lBIAPEsZj03pENeUk.png?width=1152&height=864"
+    },
+    {
+      "slug": "paracare",
+      "name": "Paracare",
+      "category": "MEDICAMENT",
+      "principeActif": "Paracetamol",
+      "forme": "Suspension buvable , solution pour perfusion et comprimé",
+      "conditionnement": "Flacon 60ml /100ml , flacon de 100ml et boîte de 10×10",
+      "classe": "Antalgique, antipyrétique",
+      "indications": "Douleurs et fièvre",
+      "flavor": "Goût fraise",
+      "dosages": [
+        "10mg/ml",
+        "125mg/5ml"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "paracare",
+      "sourceImageUrl": "https://framerusercontent.com/images/ogUZZbv8Ns9qqECpIruLjtU0eEA.png?width=4000&height=4000"
+    },
+    {
+      "slug": "prednicare",
+      "name": "Prednicare",
+      "category": "MEDICAMENT",
+      "principeActif": "Prednisolone",
+      "forme": "Comprimé non pelliculé",
+      "conditionnement": "Boîte de 10×10",
+      "classe": "Corticoïde",
+      "indications": "Maladies inflammatoires chroniques et allergies",
+      "flavor": null,
+      "dosages": [
+        "5mg",
+        "20mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "prédnicare",
+      "sourceImageUrl": "https://framerusercontent.com/images/s41p4y8hdTmDlzxgGntSX0h7U.png?width=4000&height=4000"
+    },
+    {
+      "slug": "sro",
+      "name": "SRO",
+      "category": "MEDICAMENT",
+      "principeActif": "SRO M&S Care",
+      "forme": "Poudre",
+      "conditionnement": "Boîte de 50",
+      "classe": "",
+      "indications": "Prévention et traitement de la déshydratation",
+      "flavor": "Goût orange",
+      "dosages": [
+        "20,5g"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "sro-ms-care",
+      "sourceImageUrl": "https://framerusercontent.com/images/IGVnYylO5teo9AChJrbjZiMSe0.png?width=2000&height=2000"
+    },
+    {
+      "slug": "vastacare",
+      "name": "Vastacare",
+      "category": "MEDICAMENT",
+      "principeActif": "Atorvastatine USP",
+      "forme": "Comprimés pelliculés",
+      "conditionnement": "Boîte de 3×10",
+      "classe": "Statines",
+      "indications": "Hypercholestérolémie, dyslipidémie et prévention des maladies cardiovasculaires",
+      "flavor": null,
+      "dosages": [
+        "10mg",
+        "20mg",
+        "40mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "vastacare",
+      "sourceImageUrl": "https://framerusercontent.com/images/RJV5HYT8wctGTlYpOH7F15Ujwtk.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-vitamine-c",
+      "name": "Fizzcare vitamine C",
+      "category": "SUPPLEMENT",
+      "principeActif": "Acide ascorbique",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Fortifiants",
+      "indications": "Traitement des carences en vitamine C, états de fatigue et du scorbut",
+      "flavor": "Goût orange et cassis sureau",
+      "dosages": [
+        "500mg",
+        "1000mg"
+      ],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-vitamine-c",
+      "sourceImageUrl": "https://framerusercontent.com/images/JuaTCOXREU3KyOFcEks1StJyLdc.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-cal-d3",
+      "name": "Fizzcare Cal - D3",
+      "category": "SUPPLEMENT",
+      "principeActif": "Calcium, vitamine C, vitamine D3",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Renforce la santé osseuse, musculaire et dentaire. Aide à la cicatrisation rapide des fractures",
+      "flavor": "Goût orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-cal---d3",
+      "sourceImageUrl": "https://framerusercontent.com/images/36JJFIB0x8aV23TBmpp3blZbpGY.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-energie",
+      "name": "Fizzcare énergie",
+      "category": "SUPPLEMENT",
+      "principeActif": "Vitamines du groupe B, vitamine C, caféine, calcium, magnésium, zinc",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Réduit la fatigue et soutient la vitalité physique et mentale",
+      "flavor": "Orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-énergie",
+      "sourceImageUrl": "https://framerusercontent.com/images/WL14w1ssurr7ff8qUS3lwzlSdg.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-immunite",
+      "name": "Fizzcare immunité",
+      "category": "SUPPLEMENT",
+      "principeActif": "Vitamine C, zinc",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Renforce le système immunitaire, lutte contre la fatigue et soutient la vitalité au quotidien",
+      "flavor": "Orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-immunité",
+      "sourceImageUrl": "https://framerusercontent.com/images/5wcHbWm4J8OXcJAbyQpSDlEVw.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-neuro",
+      "name": "Fizzcare neuro",
+      "category": "SUPPLEMENT",
+      "principeActif": "Vitamine groupe B, magnésium",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Soutient le système nerveux et réduit la fatigue",
+      "flavor": "Goût orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-neuro",
+      "sourceImageUrl": "https://framerusercontent.com/images/xvYKrK9904Xp7kFgogjzMNHZX0.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-osteo",
+      "name": "Fizzcare osteo",
+      "category": "SUPPLEMENT",
+      "principeActif": "Calcium, magnésium, vitamine D3, vitamine C, zinc, selenium, cuivre, manganese",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Soutient le capital osseux et contribue au bon fonctionnement articulaire",
+      "flavor": "Goût orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-osteo",
+      "sourceImageUrl": "https://framerusercontent.com/images/li1choHgxwY0J32mJjPrvyFhQ.png?width=4000&height=4000"
+    },
+    {
+      "slug": "fizzcare-zinc",
+      "name": "Fizzcare Zinc",
+      "category": "SUPPLEMENT",
+      "principeActif": "Zinc",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Soutient le système immunitaire et contribue à la santé de la peau",
+      "flavor": "Orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "fizzacare-zinc",
+      "sourceImageUrl": "https://framerusercontent.com/images/HzSP6TgT9oSxziAUDYdddF02RwQ.png?width=4000&height=4000"
+    },
+    {
+      "slug": "vitalcare-beaute",
+      "name": "Vitalcare beauté",
+      "category": "SUPPLEMENT",
+      "principeActif": "Collagène marin, vitamine C, vitamine E, biotine, acide hyaluronique, zinc, vitamine B2, iode, cuivre",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément Alimentaire",
+      "indications": "Contribue à la santé de la peau, des cheveux et des ongles",
+      "flavor": "Orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "vitalcare-beauté",
+      "sourceImageUrl": "https://framerusercontent.com/images/cS9KITPUQ5R7HPVbpwSoODk33A.png?width=4000&height=4000"
+    },
+    {
+      "slug": "vitalcare-sommeil",
+      "name": "Vitalcare sommeil",
+      "category": "SUPPLEMENT",
+      "principeActif": "Magnésium, vitamine du groupe B, tryptophane, mélatonine",
+      "forme": "Comprimé effervescent",
+      "conditionnement": "Boîte de 20",
+      "classe": "Complément alimentaire",
+      "indications": "Favorise le sommeil et la relaxation",
+      "flavor": "Goût orange",
+      "dosages": [],
+      "source": "https://mandscare.com/",
+      "sourceSlug": "vitalcare-sommeil",
+      "sourceImageUrl": "https://framerusercontent.com/images/JgL53QJs19n3HDffPfKElEWtA4.png?width=4000&height=4000"
+    }
+  ]
+}
