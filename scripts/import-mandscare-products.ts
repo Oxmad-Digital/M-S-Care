@@ -10,6 +10,7 @@ import { ProductCategory } from "@prisma/client";
 import catalogue from "../data/mandscare-products.json";
 import { prisma } from "../src/lib/prisma";
 import { getR2Bucket, publicUrlFor } from "../src/lib/r2";
+import { formatProductName } from "../src/lib/product-name";
 
 const APPLY = process.argv.includes("--apply");
 const PNG_SIGNATURE = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]);
@@ -81,7 +82,7 @@ async function main() {
     skipDuplicates: true,
     data: missing.map((product, index) => ({
       slug: product.slug,
-      name: product.name,
+      name: formatProductName(product.name),
       category: product.category as ProductCategory,
       principeActif: product.principeActif,
       dosages: product.dosages,

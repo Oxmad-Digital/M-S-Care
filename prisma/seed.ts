@@ -42,7 +42,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "aldacare",
-    name: "Aldacare",
+    name: "AldaCare",
     category: ProductCategory.OTC,
     principeActif: "Albendazole",
     dosages: ["200mg/5ml", "400mg"],
@@ -61,7 +61,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "azithcare",
-    name: "Azithcare",
+    name: "AzithCare",
     category: ProductCategory.MEDICAMENT,
     principeActif: "Azithromycine USP",
     dosages: ["500mg"],
@@ -73,7 +73,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "cotrimcare",
-    name: "Cotrimcare",
+    name: "CotrimCare",
     category: ProductCategory.MEDICAMENT,
     principeActif: "Sulfamethoxazole et trimethoprime",
     dosages: ["240mg/5ml"],
@@ -87,7 +87,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "cefixcare",
-    name: "Cefixcare",
+    name: "CefixCare",
     category: ProductCategory.MEDICAMENT,
     principeActif: "Cefixime trihydrate",
     dosages: ["40mg/5ml", "100mg/5ml", "200mg"],
@@ -101,7 +101,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "ceftricare",
-    name: "Ceftricare",
+    name: "CeftriCare",
     category: ProductCategory.MEDICAMENT,
     principeActif: "Ceftriaxone USP",
     dosages: ["1g / 10ml"],
@@ -114,7 +114,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "ciflocare",
-    name: "Ciflocare",
+    name: "CifloCare",
     category: ProductCategory.MEDICAMENT,
     principeActif: "Ciprofloxacine USP",
     dosages: ["500mg"],
@@ -127,7 +127,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "fizzcare-paracetamol",
-    name: "Fizzcare paracetamol",
+    name: "FizzCare paracetamol",
     category: ProductCategory.OTC,
     principeActif: "Paracetamol",
     dosages: ["500mg", "1000mg"],
@@ -139,7 +139,7 @@ const PRODUCTS: RawProduct[] = [
   },
   {
     slug: "ibucare",
-    name: "Ibucare",
+    name: "IbuCare",
     category: ProductCategory.OTC,
     principeActif: "Ibuprofene BP",
     dosages: ["100mg/5ml", "200mg", "400mg"],

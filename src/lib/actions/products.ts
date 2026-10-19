@@ -6,6 +6,7 @@ import { ProductCategory } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { PRODUCTS_TAG } from "@/lib/catalogue";
 import { normalizeDosage } from "@/lib/product-variants";
+import { formatProductName } from "@/lib/product-name";
 import { requireUser } from "@/lib/current-user";
 
 function slugify(name: string): string {
@@ -28,7 +29,7 @@ async function uniqueSlug(name: string) {
 
 function readProductFields(formData: FormData) {
   return {
-    name: String(formData.get("name") ?? "").trim(),
+    name: formatProductName(String(formData.get("name") ?? "").trim()),
     category: String(formData.get("category") ?? "") as ProductCategory,
     principeActif: String(formData.get("principeActif") ?? "").trim(),
     forme: String(formData.get("forme") ?? "").trim(),
