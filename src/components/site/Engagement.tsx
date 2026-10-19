@@ -3,7 +3,7 @@ import { Reveal, RevealGroup, RevealImage, RevealItem, RevealText } from "@/comp
 
 export function Engagement() {
   return (
-    <section id="engagement" aria-labelledby="engagement-title" className="bg-ms-bg">
+    <section id="engagement" aria-labelledby="engagement-title" className="bg-white">
       <div className="mx-auto max-w-[1280px] px-5 py-18 sm:px-8 sm:py-24 lg:px-14">
         <div className="grid grid-cols-1 items-center gap-9 lg:grid-cols-2 lg:gap-20">
           <figure className="m-0">
