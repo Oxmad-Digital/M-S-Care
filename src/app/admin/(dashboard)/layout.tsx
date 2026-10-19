@@ -43,9 +43,14 @@ export default async function AdminDashboardLayout({
         <div className="px-2 py-2 md:border-t md:border-ms-border md:p-4">
           <Link
             href="/"
-            className="block rounded-md px-3 py-2.5 text-[14.5px] font-medium text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
+            className="flex items-center gap-2 rounded-md px-3 py-2.5 text-[14.5px] font-medium text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
           >
-            ← Voir le site
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M2 12h20" />
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+            </svg>
+            Voir le site
           </Link>
         </div>
         <form action={logoutAction} className="px-2 py-2 md:border-t md:border-ms-border md:p-4">

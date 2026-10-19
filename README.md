@@ -26,6 +26,7 @@ cp .env.example .env
 
 - `DATABASE_URL` / `DIRECT_URL` : connection strings Neon récupérées à l'étape 1.
 - `AUTH_SECRET` : générer avec `openssl rand -base64 32`.
+- `AUTH_TRUST_HOST=true` : uniquement pour lancer `npm run start` en local (inutile sur Vercel).
 
 ## 3. Installer les dépendances
 
