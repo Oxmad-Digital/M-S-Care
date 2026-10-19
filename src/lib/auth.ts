@@ -19,14 +19,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           return null;
         }
 
-        const user = await prisma.user.findUnique({ where: { email } });
+        // Insensible à la casse : les adresses invitées sont enregistrées en minuscules.
+        const user = await prisma.user.findFirst({ where: { email: { equals: email.trim(), mode: "insensitive" } } });
         if (!user) return null;
 
         const valid = await bcrypt.compare(password, user.passwordHash);
         if (!valid) return null;
 
-        return { id: user.id, email: user.email, name: user.name };
+        return { id: user.id, email: user.email, name: `${user.firstName} ${user.lastName}`.trim() };
       },
     }),
   ],
+  callbacks: {
+    // Le rôle n'est pas mis dans le jeton : il est relu en base à chaque requête
+    // (voir current-user.ts) pour qu'un changement de droits s'applique aussitôt.
+    session({ session, token }) {
+      if (token.sub) session.user.id = token.sub;
+      return session;
+    },
+  },
 });

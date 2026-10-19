@@ -41,9 +41,11 @@ function TextField({
 export function ProductForm({
   action,
   product,
+  readOnly = false,
 }: {
-  action: (formData: FormData) => void;
+  action?: (formData: FormData) => void;
   product?: Product & { notices: Notice[]; variants: ProductVariant[] };
+  readOnly?: boolean;
 }) {
   const { byDosage, otherNotices } = matchDosageNotices(product ?? { dosages: [], notices: [] });
   const dosages = (product?.dosages ?? []).map((dosage, index) => ({
@@ -56,71 +58,76 @@ export function ProductForm({
   }));
 
   return (
-    <form action={action} className="grid gap-5 sm:grid-cols-2">
-      <TextField name="name" label="Nom" defaultValue={product?.name} />
+    <form action={action}>
+      {/* En lecture seule (rôle visiteur), le fieldset désactive tous les champs. */}
+      <fieldset disabled={readOnly} className="grid min-w-0 gap-5 sm:grid-cols-2">
+        <TextField name="name" label="Nom" defaultValue={product?.name} />
 
-      <label className="grid gap-1.5">
-        <span className="text-[13px] font-semibold text-ms-text">Catégorie</span>
-        <select
-          name="category"
-          required
-          defaultValue={product?.category ?? ProductCategory.MEDICAMENT}
-          className={fieldClass}
-        >
-          {CATEGORY_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </label>
+        <label className="grid gap-1.5">
+          <span className="text-[13px] font-semibold text-ms-text">Catégorie</span>
+          <select
+            name="category"
+            required
+            defaultValue={product?.category ?? ProductCategory.MEDICAMENT}
+            className={fieldClass}
+          >
+            {CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </label>
 
-      <TextField name="principeActif" label="Principe actif" defaultValue={product?.principeActif} />
-      <TextField name="classe" label="Classe" defaultValue={product?.classe} />
-      <TextField name="forme" label="Forme" defaultValue={product?.forme} />
-      <TextField name="conditionnement" label="Conditionnement" defaultValue={product?.conditionnement} />
+        <TextField name="principeActif" label="Principe actif" defaultValue={product?.principeActif} />
+        <TextField name="classe" label="Classe" defaultValue={product?.classe} />
+        <TextField name="forme" label="Forme" defaultValue={product?.forme} />
+        <TextField name="conditionnement" label="Conditionnement" defaultValue={product?.conditionnement} />
 
-      <label className="grid gap-1.5 sm:col-span-2">
-        <span className="text-[13px] font-semibold text-ms-text">
-          Indications
-        </span>
-        <textarea
-          name="indications"
-          rows={3}
-          required
-          defaultValue={product?.indications}
-          className="rounded-md border border-ms-accent/24 px-3 py-2.5 text-[15px] outline-none focus:border-ms-accent"
-        />
-      </label>
+        <label className="grid gap-1.5 sm:col-span-2">
+          <span className="text-[13px] font-semibold text-ms-text">
+            Indications
+          </span>
+          <textarea
+            name="indications"
+            rows={3}
+            required
+            defaultValue={product?.indications}
+            className="rounded-md border border-ms-accent/24 px-3 py-2.5 text-[15px] outline-none focus:border-ms-accent"
+          />
+        </label>
 
-      <TextField name="flavor" label="Goût / saveur (optionnel)" defaultValue={product?.flavor} required={false} />
+        <TextField name="flavor" label="Goût / saveur (optionnel)" defaultValue={product?.flavor} required={false} />
 
-      <label className="flex items-center gap-2.5 self-end sm:h-11">
-        <input
-          name="published"
-          type="checkbox"
-          defaultChecked={product?.published ?? true}
-          className="h-4 w-4"
-        />
-        <span className="text-[14px] font-medium text-ms-text">
-          Publié sur le site
-        </span>
-      </label>
+        <label className="flex items-center gap-2.5 self-end sm:h-11">
+          <input
+            name="published"
+            type="checkbox"
+            defaultChecked={product?.published ?? true}
+            className="h-4 w-4"
+          />
+          <span className="text-[14px] font-medium text-ms-text">
+            Publié sur le site
+          </span>
+        </label>
 
-      <div className="sm:col-span-2">
-        <DosagesField dosages={dosages} imageUrl={product?.imageUrl} />
-      </div>
+        <div className="sm:col-span-2">
+          <DosagesField dosages={dosages} imageUrl={product?.imageUrl} />
+        </div>
 
-      <div className="sm:col-span-2">
-        <NoticesField notices={otherNotices} />
-      </div>
+        <div className="sm:col-span-2">
+          <NoticesField notices={otherNotices} />
+        </div>
 
-      <button
-        type="submit"
-        className="mt-2 h-11 w-fit rounded-full bg-ms-accent px-8 text-[15px] font-semibold text-white transition hover:bg-ms-primary"
-      >
-        Enregistrer
-      </button>
+        {!readOnly && (
+          <button
+            type="submit"
+            className="mt-2 h-11 w-fit rounded-full bg-ms-accent px-8 text-[15px] font-semibold text-white transition hover:bg-ms-primary"
+          >
+            Enregistrer
+          </button>
+        )}
+      </fieldset>
     </form>
   );
 }

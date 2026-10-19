@@ -8,6 +8,7 @@ import { Engagement } from "@/components/site/Engagement";
 import { Catalogue } from "@/components/site/Catalogue";
 import { ContactSection } from "@/components/site/ContactSection";
 import { Footer } from "@/components/site/Footer";
+import { MaintenanceGate } from "@/components/site/MaintenanceGate";
 
 export const dynamic = "force-dynamic";
 
@@ -28,7 +29,7 @@ export default async function Home() {
   }));
 
   return (
-    <>
+    <MaintenanceGate>
       <Header />
       <main>
         <Hero />
@@ -46,6 +47,6 @@ export default async function Home() {
         <ContactSection />
       </main>
       <Footer />
-    </>
+    </MaintenanceGate>
   );
 }

@@ -3,9 +3,9 @@ import { NextResponse } from "next/server";
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
-  const isLoginPage = pathname === "/admin/login";
+  const isPublicPage = pathname === "/admin/login" || pathname.startsWith("/admin/invitation/");
 
-  if (pathname.startsWith("/admin") && !isLoginPage && !req.auth) {
+  if (pathname.startsWith("/admin") && !isPublicPage && !req.auth) {
     const loginUrl = new URL("/admin/login", req.nextUrl.origin);
     return NextResponse.redirect(loginUrl);
   }

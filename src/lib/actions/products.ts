@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { ProductCategory } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { normalizeDosage } from "@/lib/product-variants";
+import { requireUser } from "@/lib/current-user";
 
 function slugify(name: string): string {
   return name
@@ -78,6 +79,7 @@ function readDosages(formData: FormData) {
 }
 
 export async function createProduct(formData: FormData) {
+  await requireUser("edit");
   const fields = readProductFields(formData);
   const { imageUrl, dosages, variants, notices } = readDosages(formData);
   const slug = await uniqueSlug(fields.name);
@@ -93,6 +95,7 @@ export async function createProduct(formData: FormData) {
 }
 
 export async function updateProduct(id: string, formData: FormData) {
+  await requireUser("edit");
   const fields = readProductFields(formData);
   const { imageUrl, dosages, variants, notices } = readDosages(formData);
 
@@ -112,11 +115,13 @@ function revalidateProducts() {
 }
 
 export async function deleteProducts(ids: string[]) {
+  await requireUser("delete");
   await prisma.product.deleteMany({ where: { id: { in: ids } } });
   revalidateProducts();
 }
 
 export async function setProductsPublished(ids: string[], published: boolean) {
+  await requireUser("edit");
   await prisma.product.updateMany({ where: { id: { in: ids } }, data: { published } });
   revalidateProducts();
 }
@@ -124,6 +129,7 @@ export async function setProductsPublished(ids: string[], published: boolean) {
 // Échange le produit avec son voisin, puis renumérote tout le catalogue pour
 // effacer les doublons éventuels de `order`.
 export async function moveProduct(id: string, direction: "up" | "down") {
+  await requireUser("edit");
   const products = await prisma.product.findMany({
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     select: { id: true, order: true },

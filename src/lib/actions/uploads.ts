@@ -3,7 +3,8 @@
 import { randomUUID } from "node:crypto";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { auth } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/current-user";
+import { can } from "@/lib/permissions";
 import {
   getR2Bucket,
   publicUrlFor,
@@ -31,8 +32,8 @@ export async function createUploadUrl(
   contentType: string,
   size: number,
 ): Promise<UploadTarget> {
-  const session = await auth();
-  if (!session?.user) return { ok: false, error: "Non autorisé." };
+  const user = await getCurrentUser();
+  if (!user || !can(user.role, "edit")) return { ok: false, error: "Non autorisé." };
 
   const rules = RULES[kind];
   if (!rules) return { ok: false, error: "Type d'upload inconnu." };

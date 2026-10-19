@@ -1,9 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { readDatabase } from "@/lib/database-read";
 import { matchDosageNotices, normalizeDosage } from "@/lib/product-variants";
+import { requireUser } from "@/lib/current-user";
+import { can } from "@/lib/permissions";
 import { ProductsTable, type AdminProductRow } from "./ProductsTable";
 
 export async function ProductsList() {
+  const user = await requireUser();
   const products = await readDatabase(() => prisma.product.findMany({
     orderBy: [{ order: "asc" }, { createdAt: "asc" }],
     include: {
@@ -41,5 +44,5 @@ export async function ProductsList() {
     };
   });
 
-  return <ProductsTable products={rows} />;
+  return <ProductsTable products={rows} canEdit={can(user.role, "edit")} canDelete={can(user.role, "delete")} />;
 }

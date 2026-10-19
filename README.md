@@ -49,7 +49,7 @@ Définir `ADMIN_EMAIL` et `ADMIN_PASSWORD` (dans `.env` ou en variables d'enviro
 ADMIN_EMAIL="admin@exemple.mg" ADMIN_PASSWORD="motdepasse-solide" npm run seed
 ```
 
-Cela crée le compte admin et importe les 9 produits de la maquette d'origine. **Pensez à changer le mot de passe** (ou recréer un utilisateur) après la première connexion — il n'y a pas encore d'écran "changer mon mot de passe" dans l'admin, cela se fait en relançant le seed avec un nouveau mot de passe, ou directement en base.
+Cela crée le compte admin et importe les 9 produits de la maquette d'origine. **Pensez à changer le mot de passe** après la première connexion, depuis `/admin/parametres`.
 
 ## 6. Lancer le site en local
 
@@ -64,6 +64,25 @@ npm run dev
 
 - `/admin/produits` : liste, création, édition, suppression et publication/dépublication des produits.
 - `/admin/messages` : consultation des messages envoyés depuis le formulaire de contact du site public.
+- `/admin/parametres` : profil (prénom, nom, mot de passe) ; pour les administrateurs, écran de maintenance du site et gestion de l'équipe.
+
+### Rôles
+
+| Rôle | Droits |
+| --- | --- |
+| Administrateur | Tout, y compris supprimer des produits, la maintenance et l'équipe. |
+| Membre | Crée, modifie, publie ou passe en brouillon les fiches ; ne peut pas les supprimer. |
+| Visiteur | Consulte l'espace admin sans rien modifier. |
+
+Les droits sont vérifiés dans chaque action serveur ; l'interface masque seulement les commandes inaccessibles.
+
+### Invitations
+
+Un administrateur invite une personne par email depuis `/admin/parametres`. Le mail est envoyé via Plunk (`PLUNK_SECRET_KEY`) et contient un lien valable 7 jours vers `/admin/invitation/<jeton>`, où la personne choisit son nom et son mot de passe. Le lien est construit à partir de `APP_URL` si elle est définie (recommandé en production, ex. `https://www.mandscare.mg`), sinon de l'hôte de la requête.
+
+### Maintenance
+
+Quand la maintenance est activée, le site public (accueil et fiches produits) affiche un écran de maintenance avec un message personnalisable. Les personnes connectées à l'admin continuent de voir le site, avec un bandeau.
 
 Toutes les routes `/admin/*` (hors `/admin/login`) sont protégées par un middleware qui exige une session valide.
 

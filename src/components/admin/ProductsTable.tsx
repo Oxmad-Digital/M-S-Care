@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import type { ProductCategory } from "@prisma/client";
 import { CATEGORY_LABEL } from "@/lib/types";
 import { deleteProducts, moveProduct, setProductsPublished } from "@/lib/actions/products";
-import { ActionsMenu } from "./ActionsMenu";
+import { ActionsMenu, type MenuItem } from "./ActionsMenu";
 import { ConfirmDialog } from "./ConfirmDialog";
 
 export type AdminProductRow = {
@@ -42,7 +42,16 @@ function plural(count: number, word: string) {
   return `${count} ${word}${count > 1 ? "s" : ""}`;
 }
 
-export function ProductsTable({ products }: { products: AdminProductRow[] }) {
+// Les droits ne servent ici qu'à masquer les commandes : les actions serveur les revérifient.
+export function ProductsTable({
+  products,
+  canEdit,
+  canDelete,
+}: {
+  products: AdminProductRow[];
+  canEdit: boolean;
+  canDelete: boolean;
+}) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
@@ -183,24 +192,30 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
             {isFiltered && ` — ${plural(visible.length, "affiché")}`}
           </p>
         </div>
-        <Link
-          href={withFilters("/admin/produits/nouveau")}
-          className="rounded-full bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary"
-        >
-          Nouveau produit
-        </Link>
+        {canEdit && (
+          <Link
+            href={withFilters("/admin/produits/nouveau")}
+            className="rounded-full bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary"
+          >
+            Nouveau produit
+          </Link>
+        )}
       </div>
 
       {products.length === 0 ? (
         <div className="rounded-lg border border-dashed border-ms-border bg-white px-6 py-14 text-center">
           <p className="font-semibold text-ms-primary">Aucun produit pour le moment.</p>
-          <p className="mt-1 text-[14px] text-ms-text-soft">Créez le premier produit pour alimenter le catalogue.</p>
-          <Link
-            href="/admin/produits/nouveau"
-            className="mt-5 inline-block rounded-full bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary"
-          >
-            Créer un produit
-          </Link>
+          {canEdit && (
+            <>
+              <p className="mt-1 text-[14px] text-ms-text-soft">Créez le premier produit pour alimenter le catalogue.</p>
+              <Link
+                href="/admin/produits/nouveau"
+                className="mt-5 inline-block rounded-full bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary"
+              >
+                Créer un produit
+              </Link>
+            </>
+          )}
         </div>
       ) : (
         <>
@@ -261,9 +276,11 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
               <button type="button" onClick={() => publish(visibleSelected, false)} className="font-semibold text-ms-accent hover:text-ms-primary">
                 Dépublier
               </button>
-              <button type="button" onClick={() => setToDelete(visibleSelected)} className="font-semibold text-red-600 hover:text-red-700">
-                Supprimer
-              </button>
+              {canDelete && (
+                <button type="button" onClick={() => setToDelete(visibleSelected)} className="font-semibold text-red-600 hover:text-red-700">
+                  Supprimer
+                </button>
+              )}
               <button type="button" onClick={() => setSelected(new Set())} className="ml-auto font-semibold text-ms-text-soft hover:text-ms-primary">
                 Annuler
               </button>
@@ -286,19 +303,23 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
               <table className="w-full text-left text-[14px]">
                 <thead>
                   <tr className="border-b border-ms-border text-[12px] font-bold tracking-wide text-ms-text-muted uppercase">
-                    <th className="w-10 py-3 pr-1 pl-4">
-                      <input
-                        ref={selectAllRef}
-                        type="checkbox"
-                        checked={allSelected}
-                        onChange={() => setSelected(allSelected ? new Set() : new Set(visible.map((product) => product.id)))}
-                        aria-label="Tout sélectionner"
-                        className="size-4 accent-ms-accent"
-                      />
-                    </th>
-                    <th className="w-12 px-1 py-3">
-                      <span className="sr-only">Ordre</span>
-                    </th>
+                    {canEdit && (
+                      <>
+                        <th className="w-10 py-3 pr-1 pl-4">
+                          <input
+                            ref={selectAllRef}
+                            type="checkbox"
+                            checked={allSelected}
+                            onChange={() => setSelected(allSelected ? new Set() : new Set(visible.map((product) => product.id)))}
+                            aria-label="Tout sélectionner"
+                            className="size-4 accent-ms-accent"
+                          />
+                        </th>
+                        <th className="w-12 px-1 py-3">
+                          <span className="sr-only">Ordre</span>
+                        </th>
+                      </>
+                    )}
                     <th className="px-3 py-3">Produit</th>
                     <th className="hidden px-3 py-3 md:table-cell">Catégorie</th>
                     <th className="hidden px-3 py-3 lg:table-cell">Dosages</th>
@@ -313,6 +334,18 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
                   {visible.map((product, index) => {
                     const pending = pendingIds.has(product.id);
                     const editHref = withFilters(`/admin/produits/${product.id}`);
+                    const menuItems: MenuItem[] = [
+                      ...(product.published
+                        ? [{ label: "Voir sur le site", href: `/produits/${encodeURIComponent(product.slug)}`, external: true }]
+                        : []),
+                      ...(canEdit
+                        ? [
+                            { label: "Dupliquer", href: withFilters("/admin/produits/nouveau", { depuis: product.id }) },
+                            { label: product.published ? "Dépublier" : "Publier", onSelect: () => publish([product], !product.published) },
+                          ]
+                        : []),
+                      ...(canDelete ? [{ label: "Supprimer", onSelect: () => setToDelete([product]), danger: true }] : []),
+                    ];
                     return (
                       <tr
                         key={product.id}
@@ -321,40 +354,44 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
                           pending ? "pointer-events-none opacity-50" : ""
                         } ${selected.has(product.id) ? "bg-ms-badge/60" : "hover:bg-ms-bg/60"}`}
                       >
-                        <td className="py-3 pr-1 pl-4">
-                          <input
-                            type="checkbox"
-                            checked={selected.has(product.id)}
-                            onChange={() => toggleSelected(product.id)}
-                            aria-label={`Sélectionner ${product.name}`}
-                            className="size-4 accent-ms-accent"
-                          />
-                        </td>
-                        <td className="px-1 py-3">
-                          <div
-                            className="flex flex-col items-center"
-                            title={isFiltered ? "Réinitialisez les filtres pour changer l’ordre" : undefined}
-                          >
-                            <button
-                              type="button"
-                              disabled={isFiltered || index === 0}
-                              onClick={() => run([product.id], () => moveProduct(product.id, "up"))}
-                              aria-label={`Monter ${product.name}`}
-                              className="rounded px-1.5 text-[11px] leading-4 text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary disabled:opacity-25 disabled:hover:bg-transparent"
-                            >
-                              ▲
-                            </button>
-                            <button
-                              type="button"
-                              disabled={isFiltered || index === visible.length - 1}
-                              onClick={() => run([product.id], () => moveProduct(product.id, "down"))}
-                              aria-label={`Descendre ${product.name}`}
-                              className="rounded px-1.5 text-[11px] leading-4 text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary disabled:opacity-25 disabled:hover:bg-transparent"
-                            >
-                              ▼
-                            </button>
-                          </div>
-                        </td>
+                        {canEdit && (
+                          <>
+                            <td className="py-3 pr-1 pl-4">
+                              <input
+                                type="checkbox"
+                                checked={selected.has(product.id)}
+                                onChange={() => toggleSelected(product.id)}
+                                aria-label={`Sélectionner ${product.name}`}
+                                className="size-4 accent-ms-accent"
+                              />
+                            </td>
+                            <td className="px-1 py-3">
+                              <div
+                                className="flex flex-col items-center"
+                                title={isFiltered ? "Réinitialisez les filtres pour changer l’ordre" : undefined}
+                              >
+                                <button
+                                  type="button"
+                                  disabled={isFiltered || index === 0}
+                                  onClick={() => run([product.id], () => moveProduct(product.id, "up"))}
+                                  aria-label={`Monter ${product.name}`}
+                                  className="rounded px-1.5 text-[11px] leading-4 text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary disabled:opacity-25 disabled:hover:bg-transparent"
+                                >
+                                  ▲
+                                </button>
+                                <button
+                                  type="button"
+                                  disabled={isFiltered || index === visible.length - 1}
+                                  onClick={() => run([product.id], () => moveProduct(product.id, "down"))}
+                                  aria-label={`Descendre ${product.name}`}
+                                  className="rounded px-1.5 text-[11px] leading-4 text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary disabled:opacity-25 disabled:hover:bg-transparent"
+                                >
+                                  ▼
+                                </button>
+                              </div>
+                            </td>
+                          </>
+                        )}
                         <td className="px-3 py-3">
                           <div className="flex items-center gap-3">
                             {/* eslint-disable-next-line @next/next/no-img-element -- simple miniature admin */}
@@ -404,19 +441,11 @@ export function ProductsTable({ products }: { products: AdminProductRow[] }) {
                         <td className="px-4 py-3">
                           <div className="flex items-center justify-end gap-2">
                             <Link href={editHref} className="font-semibold text-ms-accent hover:text-ms-primary">
-                              Modifier
+                              {canEdit ? "Modifier" : "Consulter"}
                             </Link>
-                            <ActionsMenu
-                              label={`Autres actions pour ${product.name}`}
-                              items={[
-                                ...(product.published
-                                  ? [{ label: "Voir sur le site", href: `/produits/${encodeURIComponent(product.slug)}`, external: true }]
-                                  : []),
-                                { label: "Dupliquer", href: withFilters("/admin/produits/nouveau", { depuis: product.id }) },
-                                { label: product.published ? "Dépublier" : "Publier", onSelect: () => publish([product], !product.published) },
-                                { label: "Supprimer", onSelect: () => setToDelete([product]), danger: true },
-                              ]}
-                            />
+                            {menuItems.length > 0 && (
+                              <ActionsMenu label={`Autres actions pour ${product.name}`} items={menuItems} />
+                            )}
                           </div>
                         </td>
                       </tr>

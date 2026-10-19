@@ -167,7 +167,7 @@ async function main() {
   await prisma.user.upsert({
     where: { email: adminEmail },
     update: { passwordHash },
-    create: { email: adminEmail, passwordHash, name: "Administrateur" },
+    create: { email: adminEmail, passwordHash, firstName: "Administrateur", role: "ADMIN" },
   });
 
   for (const [index, product] of PRODUCTS.entries()) {

@@ -14,12 +14,43 @@ enum ProductCategory {
   SUPPLEMENT
 }
 
+enum Role {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String       @id @default(cuid())
+  email        String       @unique
   passwordHash String
-  name         String?
-  createdAt    DateTime @default(now())
+  firstName    String       @default("")
+  lastName     String       @default("")
+  role         Role         @default(ADMIN)
+  invitations  Invitation[]
+  createdAt    DateTime     @default(now())
+}
+
+model Invitation {
+  id          String    @id @default(cuid())
+  email       String
+  role        Role
+  // Seul le hash du jeton est stocké : le lien envoyé par mail ne se retrouve pas en base.
+  tokenHash   String    @unique
+  invitedById String?
+  invitedBy   User?     @relation(fields: [invitedById], references: [id], onDelete: SetNull)
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([email])
+}
+
+// Ligne unique (id = 1) : réglages globaux du site.
+model SiteSettings {
+  id                 Int     @id @default(1)
+  maintenance        Boolean @default(false)
+  maintenanceMessage String?
 }
 
 model Product {
@@ -76,3 +107,4 @@ model ContactMessage {
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }
+

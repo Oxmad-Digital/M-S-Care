@@ -1,9 +1,13 @@
 import { prisma } from "@/lib/prisma";
 import { markMessageRead } from "@/lib/actions/messages";
+import { requireUser } from "@/lib/current-user";
+import { can } from "@/lib/permissions";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminMessagesPage() {
+  const user = await requireUser();
+  const canEdit = can(user.role, "edit");
   const messages = await prisma.contactMessage.findMany({
     orderBy: { createdAt: "desc" },
   });
@@ -42,19 +46,21 @@ export default async function AdminMessagesPage() {
                     }).format(message.createdAt)}
                   </p>
                 </div>
-                <form
-                  action={async () => {
-                    "use server";
-                    await markMessageRead(message.id, !message.read);
-                  }}
-                >
-                  <button
-                    type="submit"
-                    className="rounded-full border border-ms-accent/30 px-3.5 py-1.5 text-xs font-semibold text-ms-primary transition hover:bg-ms-accent/10"
+                {canEdit && (
+                  <form
+                    action={async () => {
+                      "use server";
+                      await markMessageRead(message.id, !message.read);
+                    }}
                   >
-                    {message.read ? "Marquer non lu" : "Marquer comme lu"}
-                  </button>
-                </form>
+                    <button
+                      type="submit"
+                      className="rounded-full border border-ms-accent/30 px-3.5 py-1.5 text-xs font-semibold text-ms-primary transition hover:bg-ms-accent/10"
+                    >
+                      {message.read ? "Marquer non lu" : "Marquer comme lu"}
+                    </button>
+                  </form>
+                )}
               </div>
               <p className="text-[14.5px] leading-[1.6] text-ms-text">
                 {message.message}
