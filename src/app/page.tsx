@@ -1,6 +1,6 @@
 import { ViewTransition } from "react";
-import { prisma } from "@/lib/prisma";
-import { readDatabase } from "@/lib/database-read";
+import { getPublishedProducts } from "@/lib/catalogue";
+import { getSiteSettings } from "@/lib/site-settings";
 import { Header } from "@/components/site/Header";
 import { Hero } from "@/components/site/Hero";
 import { About } from "@/components/site/About";
@@ -15,20 +15,8 @@ import { PAGE_TRANSITION } from "@/components/motion/page-transition";
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const products = await readDatabase(() => prisma.product.findMany({
-    where: { published: true },
-    orderBy: { order: "asc" },
-    include: {
-      variants: {
-        orderBy: { position: "asc" },
-        select: { dosage: true, imageUrl: true },
-      },
-      notices: {
-        orderBy: { position: "asc" },
-        select: { id: true, label: true, url: true },
-      },
-    },
-  }));
+  // Réglages lus en même temps que le catalogue : MaintenanceGate réutilise ensuite ce résultat.
+  const [products] = await Promise.all([getPublishedProducts(), getSiteSettings()]);
 
   return (
     <MaintenanceGate>

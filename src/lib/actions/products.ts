@@ -1,9 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { ProductCategory } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
+import { PRODUCTS_TAG } from "@/lib/catalogue";
 import { normalizeDosage } from "@/lib/product-variants";
 import { requireUser } from "@/lib/current-user";
 
@@ -108,7 +109,9 @@ export async function updateProduct(id: string, formData: FormData) {
   redirect("/admin/produits?ok=modifie");
 }
 
+// expire: 0 — la prochaine visite relit la base au lieu de servir l'ancien catalogue.
 function revalidateProducts() {
+  revalidateTag(PRODUCTS_TAG, { expire: 0 });
   revalidatePath("/");
   revalidatePath("/produits/[slug]", "page");
   revalidatePath("/admin/produits");

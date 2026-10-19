@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { cache, ViewTransition } from "react";
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { readDatabase } from "@/lib/database-read";
+import { getPublishedProduct } from "@/lib/catalogue";
 import { ProductDetail } from "@/components/site/ProductDetail";
 import { PAGE_TRANSITION } from "@/components/motion/page-transition";
 
@@ -14,32 +13,7 @@ type Props = {
 };
 
 const getProduct = cache(async (slug: string) => {
-  const product = await readDatabase(() => prisma.product.findFirst({
-    where: { slug, published: true },
-    select: {
-      id: true,
-      slug: true,
-      name: true,
-      category: true,
-      principeActif: true,
-      dosages: true,
-      forme: true,
-      conditionnement: true,
-      classe: true,
-      indications: true,
-      flavor: true,
-      imageUrl: true,
-      variants: {
-        orderBy: { position: "asc" },
-        select: { dosage: true, imageUrl: true },
-      },
-      notices: {
-        orderBy: { position: "asc" },
-        select: { id: true, label: true, url: true },
-      },
-    },
-  }));
-
+  const product = await getPublishedProduct(slug);
   if (!product) notFound();
   return product;
 });
