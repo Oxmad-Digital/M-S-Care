@@ -8,6 +8,7 @@ import { ROLE_LABEL } from "@/lib/permissions";
 const NAV_LINKS = [
   { href: "/admin/produits", label: "Produits" },
   { href: "/admin/messages", label: "Messages" },
+  { href: "/admin/stats", label: "Statistiques" },
   { href: "/admin/parametres", label: "Paramètres" },
 ];
 

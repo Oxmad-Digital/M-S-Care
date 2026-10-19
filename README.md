@@ -86,6 +86,14 @@ Quand la maintenance est activée, le site public (accueil et fiches produits) a
 
 Toutes les routes `/admin/*` (hors `/admin/login`) sont protégées par un middleware qui exige une session valide.
 
+### Statistiques
+
+`/admin/stats` suit la fréquentation du site public (accueil et fiches produits) avec un script maison, sans service tiers ni cookie : vues, visiteurs uniques, durée moyenne par page, pages les plus vues, provenance, appareils et pays (en-tête `x-vercel-ip-country`, disponible une fois déployé sur Vercel). Périodes de 7, 30 ou 90 jours, avec l'évolution par rapport à la période précédente.
+
+- `src/components/site/Tracker.tsx` envoie chaque page vue à `/api/track`, puis le temps passé à `/api/track/duration` quand on la quitte.
+- Le visiteur est identifié par un hash (IP + navigateur + jour, salé par une clé dérivée d'`AUTH_SECRET`) : l'IP n'est jamais stockée et l'identifiant change chaque jour.
+- Les robots, les pages admin, l'équipe connectée et les visites pendant la maintenance ne sont pas comptés.
+
 ## Déploiement (Vercel)
 
 1. Connecter le repo à Vercel.

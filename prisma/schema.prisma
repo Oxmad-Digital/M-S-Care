@@ -108,3 +108,20 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+// Vue de page publique, enregistrée par /api/track (sans cookie ni IP en clair).
+model PageView {
+  id          String   @id @default(cuid())
+  // Jour UTC (AAAA-MM-JJ) : sert au regroupement et au hash visiteur, qui change chaque jour.
+  day         String
+  path        String
+  referrer    String   @default("")
+  deviceType  String   @default("desktop")
+  country     String   @default("")
+  // Temps passé sur la page en millisecondes, envoyé à la sortie de la page.
+  duration    Int?
+  visitorHash String
+  createdAt   DateTime @default(now())
+
+  @@index([day])
+  @@index([day, path])
+}
