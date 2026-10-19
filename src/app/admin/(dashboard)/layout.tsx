@@ -24,7 +24,7 @@ export default async function AdminDashboardLayout({
 
   return (
     <div className="flex min-h-screen flex-col bg-ms-bg md:flex-row">
-      <aside className="sticky top-0 z-30 flex flex-wrap items-center border-b md:h-screen md:self-start border-ms-border bg-white md:w-56 md:shrink-0 md:flex-col md:flex-nowrap md:items-stretch md:border-r md:border-b-0">
+      <aside className="sticky top-0 z-30 flex flex-wrap items-center border-b border-ms-border bg-white md:fixed md:inset-y-0 md:left-0 md:w-56 md:overflow-y-auto md:flex-col md:flex-nowrap md:items-stretch md:border-r md:border-b-0">
         <div className="px-4 py-3 md:border-b md:border-ms-border md:px-6 md:py-6">
           <p className="text-lg font-extrabold text-ms-primary">M&amp;S Care</p>
           <p className="text-xs text-ms-text-muted">Administration</p>
@@ -40,6 +40,14 @@ export default async function AdminDashboardLayout({
             </Link>
           ))}
         </nav>
+        <div className="px-2 py-2 md:border-t md:border-ms-border md:p-4">
+          <Link
+            href="/"
+            className="block rounded-md px-3 py-2.5 text-[14.5px] font-medium text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
+          >
+            ← Voir le site
+          </Link>
+        </div>
         <form action={logoutAction} className="px-2 py-2 md:border-t md:border-ms-border md:p-4">
           <div className="hidden px-3 pb-2 md:block">
             <p className="truncate text-[13.5px] font-semibold text-ms-primary">{displayName(user)}</p>
@@ -53,7 +61,7 @@ export default async function AdminDashboardLayout({
           </button>
         </form>
       </aside>
-      <main className="min-w-0 flex-1 p-4 md:p-8">
+      <main className="min-w-0 flex-1 p-4 md:ml-56 md:p-8">
         {maintenance && (
           <Link
             href="/admin/parametres#maintenance"

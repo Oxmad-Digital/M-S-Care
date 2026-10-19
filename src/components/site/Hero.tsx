@@ -43,7 +43,7 @@ export function Hero() {
           <div className="mt-8 flex flex-wrap gap-3 sm:mt-12">
             <a
               href="#nosproduits"
-              className="inline-flex items-center justify-center gap-4 rounded-full bg-ms-mint px-7 py-4 text-[15px] font-semibold text-ms-primary-dark transition hover:bg-white"
+              className="inline-flex items-center justify-center gap-4 rounded-full bg-ms-accent px-7 py-4 text-[15px] font-semibold text-white transition hover:bg-white hover:text-ms-primary"
             >
               Découvrir la gamme
               <span aria-hidden="true">↗</span>

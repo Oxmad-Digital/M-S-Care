@@ -34,8 +34,8 @@ export function Engagement() {
               Avec Interpharma, notre distributeur à Madagascar, nous accompagnons
               les besoins de santé au plus près des populations.
             </p>
-            <a href="#contacts" className="mt-8 inline-flex items-center gap-3 rounded-full bg-ms-primary px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-ms-primary-dark">
-              Échangeons sur vos besoins <span aria-hidden="true">→</span>
+            <a href="#contacts" className="mt-8 inline-flex items-center gap-3 rounded-full bg-ms-accent px-6 py-3.5 text-sm font-semibold text-white transition hover:bg-ms-primary">
+              Échangeons sur vos besoins
             </a>
           </div>
         </div>

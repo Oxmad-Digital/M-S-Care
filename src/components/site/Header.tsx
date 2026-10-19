@@ -61,7 +61,7 @@ export function Header() {
             Nous contacter
           </Link>
           <Link
-            href="/admin/login"
+            href="/admin"
             aria-label="Espace administration"
             title="Espace administration"
             className="ml-1 flex h-10 w-10 flex-none items-center justify-center rounded-full text-ms-text transition hover:bg-ms-accent/10 hover:text-ms-primary"

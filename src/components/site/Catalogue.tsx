@@ -116,7 +116,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
           <button
             type="button"
             onClick={() => setLimit(filtered.length)}
-            className="rounded-full border border-ms-accent/40 bg-transparent px-[34px] py-[15px] text-[15px] font-semibold text-ms-primary transition hover:bg-ms-accent hover:text-white hover:border-ms-accent"
+            className="rounded-full bg-ms-accent px-[34px] py-[15px] text-[15px] font-semibold text-white transition hover:bg-ms-primary"
           >
             Voir plus
           </button>
