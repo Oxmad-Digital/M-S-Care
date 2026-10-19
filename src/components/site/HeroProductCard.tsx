@@ -26,7 +26,7 @@ export function HeroProductCard({ products, className = "" }: { products: Catalo
       className={`group relative hidden w-[340px] flex-none rounded-2xl border border-white/15 bg-white/10 p-3 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15 lg:block ${className}`}
     >
       {/* Les deux produits se superposent dans la même cellule pendant le fondu croisé. */}
-      <div className="grid">
+      <div className="grid grid-cols-[minmax(0,1fr)]">
         <AnimatePresence initial={false}>
           <m.div
             key={product.id}
@@ -34,7 +34,7 @@ export function HeroProductCard({ products, className = "" }: { products: Catalo
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -16 }}
             transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
-            className="col-start-1 row-start-1 flex items-center gap-4"
+            className="col-start-1 row-start-1 flex min-w-0 items-center gap-4"
           >
             <div className="relative h-[92px] w-[92px] flex-none overflow-hidden rounded-xl bg-white">
               <Image
