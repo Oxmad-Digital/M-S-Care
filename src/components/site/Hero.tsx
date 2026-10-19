@@ -1,11 +1,13 @@
 import Image from "next/image";
+import type { CatalogueProduct } from "@/lib/types";
+import { HeroProductCard } from "./HeroProductCard";
 import styles from "./Hero.module.css";
 
-export function Hero() {
+export function Hero({ products }: { products: CatalogueProduct[] }) {
   return (
     <section
       id="top"
-      className={`${styles.hero} relative flex items-center overflow-hidden bg-ms-primary`}
+      className={`${styles.hero} relative flex items-end overflow-hidden bg-ms-primary`}
     >
       <Image
         src="/images/hero.jpeg"
@@ -28,7 +30,7 @@ export function Hero() {
         <circle cx="695" cy="500" r="305" />
         <path d="M500 0V265.5M500 734.5V1000M0 500H265.5M734.5 500H1000" />
       </svg>
-      <div className={`${styles.content} relative mx-auto w-full max-w-[1280px] px-5 sm:px-8 lg:px-14`}>
+      <div className={`${styles.content} relative mx-auto flex w-full max-w-[1920px] items-end justify-between gap-10 px-5 sm:px-8 lg:px-14 xl:px-20 2xl:px-24`}>
         <div className="max-w-[660px] animate-ms-rise">
           <p className="mb-5 text-xs font-bold tracking-[0.2em] text-ms-mint uppercase">
             Laboratoire pharmaceutique
@@ -50,6 +52,7 @@ export function Hero() {
             </a>
           </div>
         </div>
+        <HeroProductCard products={products} />
       </div>
     </section>
   );

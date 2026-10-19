@@ -2,6 +2,7 @@
 
 :root {
   --site-header-height: 5rem;
+  --site-header-height-compact: 4rem;
 }
 
 @theme inline {
@@ -23,7 +24,7 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: var(--site-header-height);
+  scroll-padding-top: var(--site-header-height-compact);
 }
 
 body {

@@ -6,7 +6,6 @@ const NAV_LINKS = [
   { href: "/#apropos", label: "Le laboratoire" },
   { href: "/#engagement", label: "Nos engagements" },
   { href: "/#contacts", label: "Contacts" },
-  { href: "#", label: "Mentions légales" },
 ];
 
 export function Footer() {
@@ -60,6 +59,10 @@ export function Footer() {
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-white/16 pt-6 sm:mt-18">
           <p className="text-[13px] text-white/75">
             © 2026 M&amp;S Care. All rights reserved.
+            <span aria-hidden="true" className="mx-2 text-white/40">·</span>
+            <Link href="/admin" className="text-white/75 transition hover:text-ms-primary-dark">
+              Administration
+            </Link>
           </p>
           <p className="text-[13px] text-white/75">
             Réalisé par{" "}

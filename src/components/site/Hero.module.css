@@ -1,11 +1,15 @@
 .hero {
-  min-height: calc(100vh - var(--site-header-height));
-  min-height: calc(100dvh - var(--site-header-height));
+  /* Le hero remonte sous le header transparent et occupe tout l'écran. */
+  margin-top: calc(-1 * var(--site-header-height));
+  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 .content {
-  padding-block: clamp(2rem, 6vh, 6rem);
-  padding-block: clamp(2rem, 6dvh, 6rem);
+  padding-top: calc(var(--site-header-height) + clamp(2rem, 6vh, 6rem));
+  padding-top: calc(var(--site-header-height) + clamp(2rem, 6dvh, 6rem));
+  padding-bottom: clamp(2rem, 6vh, 6rem);
+  padding-bottom: clamp(2rem, 6dvh, 6rem);
 }
 
 .image {

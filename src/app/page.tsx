@@ -30,9 +30,9 @@ export default async function Home() {
 
   return (
     <MaintenanceGate>
-      <Header />
+      <Header overlay />
       <main>
-        <Hero />
+        <Hero products={products} />
         <About />
         <ProductsIntro />
         <Engagement />
