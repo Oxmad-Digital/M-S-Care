@@ -5,7 +5,8 @@ import { revalidatePath } from "next/cache";
 import type { Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { displayName, requireUser, type CurrentUser } from "@/lib/current-user";
-import { appUrl, escapeHtml, sendEmail } from "@/lib/email";
+import { appUrl, sendEmail } from "@/lib/email";
+import { invitationEmail } from "@/lib/email-templates";
 import { isRole, ROLE_DESCRIPTION, ROLE_LABEL } from "@/lib/permissions";
 import { hashToken, INVITATION_DAYS } from "@/lib/invitations";
 import type { ActionState } from "@/lib/action-state";
@@ -18,24 +19,17 @@ async function sendInvitation(invitationId: string, email: string, role: Role, i
     data: { tokenHash: hashToken(token), expiresAt: new Date(Date.now() + INVITATION_DAYS * 86_400_000) },
   });
 
-  const link = `${await appUrl()}/admin/invitation/${token}`;
-  const inviterName = escapeHtml(displayName(inviter));
+  const siteUrl = await appUrl();
   await sendEmail({
     to: email,
-    subject: "Invitation à l’espace administration M&S Care",
-    body: `
-      <div style="font-family:Arial,sans-serif;color:#17342e;line-height:1.6;max-width:520px">
-        <h1 style="color:#14574b;font-size:22px">M&amp;S Care — Administration</h1>
-        <p>${inviterName} vous invite à rejoindre l’espace d’administration du site M&amp;S Care
-        en tant que <strong>${ROLE_LABEL[role]}</strong>.</p>
-        <p style="color:#526e65;font-size:14px">${escapeHtml(ROLE_DESCRIPTION[role])}</p>
-        <p style="margin:28px 0">
-          <a href="${link}" style="background:#289280;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none;font-weight:bold">
-            Accepter l’invitation
-          </a>
-        </p>
-        <p style="color:#526e65;font-size:13px">Ce lien est valable ${INVITATION_DAYS} jours. Si le bouton ne fonctionne pas, copiez cette adresse :<br>${link}</p>
-      </div>`,
+    ...invitationEmail({
+      siteUrl,
+      inviterName: displayName(inviter),
+      roleLabel: ROLE_LABEL[role],
+      roleDescription: ROLE_DESCRIPTION[role],
+      link: `${siteUrl}/admin/invitation/${token}`,
+      days: INVITATION_DAYS,
+    }),
   });
 }
 
