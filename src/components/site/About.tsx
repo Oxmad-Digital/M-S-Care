@@ -55,7 +55,13 @@ export function About() {
           </RevealItem>
         </RevealGroup>
         <RevealImage className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-ms-bg">
-          <Image src="/images/about.jpg" alt="" fill sizes="(min-width: 1024px) 50vw, 100vw" className="object-cover" />
+          <Image
+            src="https://pub-03e5ddd75c8541208a4e5d63870dd622.r2.dev/laboratoire-mns-care-sante-pour-tous.webp"
+            alt="Professionnel de santé formant un cœur avec ses mains"
+            fill
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            className="object-cover"
+          />
         </RevealImage>
       </div>
       <RevealGroup className="mt-14 grid gap-8 border-t border-ms-border pt-10 sm:grid-cols-3 sm:gap-10">

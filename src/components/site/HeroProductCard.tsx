@@ -23,7 +23,7 @@ export function HeroProductCard({ products, className = "" }: { products: Catalo
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className={`group relative hidden w-[340px] flex-none rounded-2xl border border-white/15 bg-white/10 p-3 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15 lg:block ${className}`}
+      className={`group relative hidden w-[380px] flex-none rounded-2xl border border-white/15 bg-white/10 p-4 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15 lg:block ${className}`}
     >
       {/* Les deux produits se superposent dans la même cellule pendant le fondu croisé. */}
       <div className="grid grid-cols-[minmax(0,1fr)]">
@@ -36,30 +36,30 @@ export function HeroProductCard({ products, className = "" }: { products: Catalo
             transition={{ duration: 0.6, ease: EASE_OUT_EXPO }}
             className="col-start-1 row-start-1 flex min-w-0 items-center gap-4"
           >
-            <div className="relative h-[92px] w-[92px] flex-none overflow-hidden rounded-xl bg-white">
+            <div className="relative h-[108px] w-[108px] flex-none overflow-hidden rounded-xl bg-white">
               <Image
                 src={product.imageUrl}
                 alt=""
                 fill
-                sizes="92px"
+                sizes="108px"
                 className="object-contain p-2 transition duration-500 ease-out-expo group-hover:scale-105"
               />
             </div>
             <div className="min-w-0 flex-1 pr-1">
-              <p className="mb-1 text-[10px] font-bold tracking-[0.14em] text-ms-mint uppercase">
+              <p className="mb-1 text-[11px] font-bold tracking-[0.14em] text-ms-mint uppercase">
                 {CATEGORY_LABEL[product.category]}
               </p>
               <Link
                 href={productHref(product, dosage)}
                 transitionTypes={["nav-forward"]}
-                className="block truncate text-[17px] font-bold tracking-tight text-white outline-none"
+                className="block truncate text-[18px] font-bold tracking-tight text-white outline-none"
               >
                 {/* Toute la carte est cliquable. */}
                 <span aria-hidden="true" className="absolute inset-0 rounded-2xl" />
                 {product.name}
               </Link>
-              <p className="truncate text-[13px] text-white/70">{product.principeActif}</p>
-              <p className="mt-2 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-white/90">
+              <p className="truncate text-[14px] text-white/70">{product.principeActif}</p>
+              <p className="mt-2 inline-flex items-center gap-1.5 text-[14px] font-semibold text-white/90">
                 Voir le produit
                 <span aria-hidden="true" className="transition-transform duration-500 ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
               </p>

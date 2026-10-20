@@ -41,6 +41,30 @@
 }
 
 /*
+ * iOS / iPadOS (WebKit tactile) : les écrans Apple rendent ce voile plus sombre
+ * qu'Android, on l'allège sur mobile et tablette.
+ */
+@supports (-webkit-touch-callout: none) {
+  @media (max-width: 1279px) {
+    .overlay {
+      background: linear-gradient(
+        90deg,
+        rgb(11 47 41 / 84%) 0%,
+        rgb(11 47 41 / 70%) 35%,
+        rgb(11 47 41 / 25%) 70%,
+        rgb(11 47 41 / 5%) 100%
+      );
+    }
+  }
+
+  @media (max-width: 639px) {
+    .overlay {
+      background: linear-gradient(90deg, rgb(11 47 41 / 82%), rgb(11 47 41 / 48%));
+    }
+  }
+}
+
+/*
  * Séquence d'entrée, en CSS pour démarrer dès le premier affichage (sans attendre le JS).
  * Chaque keyframe ne décrit que l'état de départ : sans animation, tout est à sa place.
  */
@@ -58,9 +82,25 @@
 
 /* Rosace qui s'ouvre depuis le centre, puis tourne très lentement. */
 .rings {
+  width: 116%;
+  height: auto;
+  aspect-ratio: 1;
+  stroke: rgb(255 255 255 / 6%);
+  stroke-width: 1.2;
   animation:
     hero-iris 2200ms var(--ease-in-out-quart) 300ms both,
     hero-spin 180s linear 2500ms infinite;
+}
+
+@media (max-width: 1279px) {
+  .rings {
+    /* Le carré couvre aussi la hauteur des écrans en portrait. */
+    width: max(116%, 116vh);
+    width: max(116%, 116dvh);
+    left: 50%;
+    stroke: rgb(255 255 255 / 18%);
+    stroke-width: 1.5;
+  }
 }
 
 .eyebrow {

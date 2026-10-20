@@ -27,8 +27,7 @@ export function Hero({ products }: { products: CatalogueProduct[] }) {
       <svg
         viewBox="0 0 1000 1000"
         aria-hidden="true"
-        className={`${styles.rings} pointer-events-none absolute top-1/2 left-[52%] h-auto w-[116%] aspect-square -translate-x-1/2 -translate-y-1/2 fill-none stroke-white/[0.06]`}
-        style={{ strokeWidth: 1.2, vectorEffect: "non-scaling-stroke" }}
+        className={`${styles.rings} pointer-events-none absolute top-1/2 left-[52%] -translate-x-1/2 -translate-y-1/2 fill-none`}
       >
         <circle cx="500" cy="305" r="305" />
         <circle cx="500" cy="695" r="305" />
