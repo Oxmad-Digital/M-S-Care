@@ -15,7 +15,7 @@ const linkButton = "text-[13.5px] font-semibold text-ms-accent hover:text-ms-pri
 
 function RoleSelect({ name, defaultValue, ...props }: { name?: string } & React.SelectHTMLAttributes<HTMLSelectElement>) {
   return (
-    <select name={name} defaultValue={defaultValue} {...props} className={`${fieldClass} w-auto`}>
+    <select name={name} defaultValue={defaultValue} {...props} className={`${fieldClass} select-chevron w-auto`}>
       {ROLES.map((role) => (
         <option key={role} value={role}>
           {ROLE_LABEL[role]}

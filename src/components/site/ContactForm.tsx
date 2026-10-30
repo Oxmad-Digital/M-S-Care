@@ -46,7 +46,7 @@ export function ContactForm() {
         <span className="text-[12.5px] font-semibold text-ms-text">
           Objet de ma demande
         </span>
-        <select name="subject" required defaultValue="" className={inputClass}>
+        <select name="subject" required defaultValue="" className={`${inputClass} select-chevron`}>
           <option value="" disabled>
             Sélectionnez un objet
           </option>
