@@ -100,6 +100,10 @@
     left: 50%;
     stroke: rgb(255 255 255 / 18%);
     stroke-width: 1.5;
+    /* On ne voit qu'une portion de la rosace : elle doit tourner plus vite pour que le mouvement se perçoive. */
+    animation:
+      hero-iris 2200ms var(--ease-in-out-quart) 300ms both,
+      hero-spin 60s linear 2500ms infinite;
   }
 }
 
