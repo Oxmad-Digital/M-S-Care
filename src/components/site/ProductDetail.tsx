@@ -9,7 +9,7 @@ import { DosageSelector } from "./DosageSelector";
 
 export function ProductDetail({ product, initialDosage }: { product: CatalogueProduct; initialDosage?: string }) {
   const [productDosage, setProductDosage] = useState<string | null>(null);
-  const { byDosage, otherNotices } = matchDosageNotices(product);
+  const { byDosage, generalNotices } = matchDosageNotices(product);
   // Par défaut (état null) : le premier dosage qui a une notice.
   const activeDosage = resolveDosage(product, productDosage ?? initialDosage ?? product.dosages.find((dosage) => byDosage.has(dosage)));
   const imageUrl = imageForDosage(product, activeDosage);
@@ -110,7 +110,7 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
                 Consulter la notice du produit
               </a>
             )}
-            {otherNotices.map((notice) => {
+            {generalNotices.map((notice) => {
               // Plusieurs notices : le libellé distingue des boutons au texte identique.
               const description =
                 product.notices.length > 1

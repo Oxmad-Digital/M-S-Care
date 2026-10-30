@@ -61,3 +61,10 @@ test("matchDosageNotices relie chaque dosage à sa notice et garde les autres", 
   assert.equal(byDosage.has("400 mg"), false);
   assert.deepEqual(otherNotices, [notices[1], notices[2]]);
 });
+
+test("matchDosageNotices ne propose une notice générale qu’avec un dosage unique ou aucun", () => {
+  const notices = [{ label: "Notice", url: "a" }];
+  assert.deepEqual(matchDosageNotices({ dosages: ["40mg/5ml", "200mg"], notices }).generalNotices, []);
+  assert.deepEqual(matchDosageNotices({ dosages: ["500mg"], notices }).generalNotices, notices);
+  assert.deepEqual(matchDosageNotices({ dosages: [], notices }).generalNotices, notices);
+});

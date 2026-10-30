@@ -30,6 +30,9 @@ export function NoticesField({
       <legend className="mb-1.5 text-[13px] font-semibold text-ms-text">
         Autres notices (non liées à un dosage)
       </legend>
+      <p className="text-[13px] text-ms-text-muted">
+        Masquées sur le site si le produit a plusieurs dosages : renseignez alors la notice de chaque dosage.
+      </p>
 
       {rows.length === 0 && (
         <p className="text-[14px] text-ms-text-muted">Aucune notice.</p>

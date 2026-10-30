@@ -29,5 +29,7 @@ export function matchDosageNotices<N extends { label: string }>(product: { dosag
   }
   const linked = new Set(byDosage.values());
   const otherNotices = product.notices.filter((n) => !linked.has(n));
-  return { byDosage, otherNotices };
+  // Avec plusieurs dosages, une notice non reliée ne correspond à aucun format : elle n'est pas proposée.
+  const generalNotices = product.dosages.length > 1 ? [] : otherNotices;
+  return { byDosage, otherNotices, generalNotices };
 }
