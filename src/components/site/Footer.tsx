@@ -60,6 +60,10 @@ export function Footer() {
           <p className="text-[13px] text-white/75">
             © 2026 M&amp;S Care. All rights reserved.
             <span aria-hidden="true" className="mx-2 text-white/40">·</span>
+            <Link href="/mentions-legales" className="text-white/75 transition hover:text-ms-primary-dark">
+              Mentions légales
+            </Link>
+            <span aria-hidden="true" className="mx-2 text-white/40">·</span>
             <Link href="/admin" className="text-white/75 transition hover:text-ms-primary-dark">
               Administration
             </Link>
