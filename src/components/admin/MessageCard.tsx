@@ -47,7 +47,7 @@ export function MessageCard({
   return (
     <article
       className={`relative rounded-lg border bg-white p-4 transition-opacity sm:p-5 ${
-        message.read ? "border-ms-border" : "border-ms-accent/60 shadow-[inset_3px_0_0_var(--color-ms-accent)]"
+        message.read ? "border-ms-border" : "border-ms-accent/40"
       } ${pending ? "opacity-60" : ""}`}
     >
       <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
