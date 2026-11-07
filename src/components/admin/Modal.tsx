@@ -29,9 +29,10 @@ export function Modal({ title, children }: { title: string; children: React.Reac
       onClick={(event) => {
         if (event.target === dialogRef.current) dialogRef.current.close();
       }}
-      className="m-auto max-h-[90vh] w-[min(56rem,calc(100vw-2rem))] rounded-xl bg-white p-0 shadow-xl backdrop:bg-black/40"
+      // Plein écran sur mobile et tablette : on neutralise les marges et tailles maximales par défaut de <dialog>.
+      className="m-auto max-h-[90vh] w-[min(56rem,calc(100vw-2rem))] rounded-xl bg-white p-0 shadow-xl backdrop:bg-black/40 max-lg:m-0 max-lg:h-dvh max-lg:max-h-none max-lg:w-full max-lg:max-w-none max-lg:rounded-none max-lg:shadow-none"
     >
-      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ms-border bg-white px-6 py-4">
+      <div className="sticky top-0 z-10 flex items-center justify-between border-b border-ms-border bg-white px-4 py-3 sm:px-6 sm:py-4">
         <h1 className="text-xl font-extrabold text-ms-primary">{title}</h1>
         <button
           type="button"
@@ -42,7 +43,7 @@ export function Modal({ title, children }: { title: string; children: React.Reac
           ×
         </button>
       </div>
-      <div className="px-6 py-5">{children}</div>
+      <div className="px-4 py-5 sm:px-6">{children}</div>
     </dialog>
   );
 }

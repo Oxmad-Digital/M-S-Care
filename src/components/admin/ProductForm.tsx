@@ -69,7 +69,7 @@ export function ProductForm({
             name="category"
             required
             defaultValue={product?.category ?? ProductCategory.MEDICAMENT}
-            className={fieldClass}
+            className={`${fieldClass} select-chevron`}
           >
             {CATEGORY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>

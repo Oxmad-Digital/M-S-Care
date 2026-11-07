@@ -57,6 +57,9 @@ export function ProductsTable({
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
   const category = searchParams.get("categorie") ?? "";
   const status = searchParams.get("statut") ?? "";
+  const activeFilterCount = Number(Boolean(category)) + Number(Boolean(status));
+  // Sur mobile, les listes de filtres sont repliées derrière un bouton (ouvert d'office si un filtre est actif).
+  const [filtersOpen, setFiltersOpen] = useState(activeFilterCount > 0);
 
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
@@ -195,7 +198,7 @@ export function ProductsTable({
         {canEdit && (
           <Link
             href={withFilters("/admin/produits/nouveau")}
-            className="rounded-full bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary"
+            className="hidden rounded-md bg-ms-accent px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-ms-primary sm:inline-block"
           >
             Nouveau produit
           </Link>
@@ -219,51 +222,90 @@ export function ProductsTable({
         </div>
       ) : (
         <>
-          <div className="mb-4 flex flex-wrap items-center gap-3">
-            <input
-              type="search"
-              value={query}
-              onChange={(event) => {
-                setQuery(event.target.value);
-                updateUrl({ q: event.target.value.trim() || null });
-              }}
-              placeholder="Rechercher un nom, un principe actif, un dosage…"
-              aria-label="Rechercher un produit"
-              className={`${fieldClass} w-full sm:w-80`}
-            />
-            <select
-              value={category}
-              onChange={(event) => updateUrl({ categorie: event.target.value || null })}
-              aria-label="Filtrer par catégorie"
-              className={fieldClass}
+          <div className="mb-4 flex flex-wrap items-center gap-3 md:flex-nowrap">
+            <div className="flex w-full gap-2 sm:w-auto md:min-w-0 md:max-w-md md:flex-1">
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => {
+                  setQuery(event.target.value);
+                  updateUrl({ q: event.target.value.trim() || null });
+                }}
+                placeholder="Rechercher un nom, un principe actif, un dosage…"
+                aria-label="Rechercher un produit"
+                className={`${fieldClass} min-w-0 flex-1 sm:w-80 sm:flex-none md:w-full md:flex-1`}
+              />
+              <button
+                type="button"
+                onClick={() => setFiltersOpen((open) => !open)}
+                aria-expanded={filtersOpen}
+                aria-controls="product-filters"
+                className={`flex h-10 shrink-0 items-center gap-1.5 rounded-md border px-3 text-[14px] font-semibold transition sm:hidden ${
+                  filtersOpen || activeFilterCount
+                    ? "border-ms-accent bg-ms-accent/10 text-ms-primary"
+                    : "border-ms-accent/24 bg-white text-ms-text"
+                }`}
+              >
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" className="size-4">
+                  <path d="M4 6h16M7 12h10M10 18h4" />
+                </svg>
+                Filtres
+                {activeFilterCount > 0 && (
+                  <span className="grid size-5 place-items-center rounded-full bg-ms-accent text-[11px] text-white">
+                    {activeFilterCount}
+                    <span className="sr-only"> actif{activeFilterCount > 1 ? "s" : ""}</span>
+                  </span>
+                )}
+              </button>
+            </div>
+            <div
+              id="product-filters"
+              className={`${filtersOpen ? "grid" : "hidden"} w-full gap-2 sm:flex sm:w-auto sm:gap-3 md:shrink-0`}
             >
-              <option value="">Toutes les catégories</option>
-              {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <select
-              value={status}
-              onChange={(event) => updateUrl({ statut: event.target.value || null })}
-              aria-label="Filtrer par statut"
-              className={fieldClass}
-            >
-              <option value="">Tous les statuts</option>
-              <option value="publie">Publiés</option>
-              <option value="brouillon">Brouillons</option>
-            </select>
+              <select
+                value={category}
+                onChange={(event) => updateUrl({ categorie: event.target.value || null })}
+                aria-label="Filtrer par catégorie"
+                className={`${fieldClass} select-chevron w-full sm:w-auto`}
+              >
+                <option value="">Toutes les catégories</option>
+                {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={status}
+                onChange={(event) => updateUrl({ statut: event.target.value || null })}
+                aria-label="Filtrer par statut"
+                className={`${fieldClass} select-chevron w-full sm:w-auto`}
+              >
+                <option value="">Tous les statuts</option>
+                <option value="publie">Publiés</option>
+                <option value="brouillon">Brouillons</option>
+              </select>
+            </div>
             {isFiltered && (
               <button
                 type="button"
                 onClick={resetFilters}
-                className="text-[14px] font-semibold text-ms-accent hover:text-ms-primary"
+                className="shrink-0 text-[14px] font-semibold whitespace-nowrap text-ms-accent hover:text-ms-primary"
               >
                 Réinitialiser
               </button>
             )}
           </div>
+
+          {/* Sur mobile, le bouton de création quitte l'en-tête pour se placer sous la recherche. */}
+          {canEdit && (
+            <Link
+              href={withFilters("/admin/produits/nouveau")}
+              className="mb-4 block rounded-md bg-ms-accent px-5 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-ms-primary sm:hidden"
+            >
+              Nouveau produit
+            </Link>
+          )}
 
           {visibleSelected.length > 0 && (
             <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-lg border border-ms-accent/40 bg-ms-badge px-4 py-2.5 text-[14px]">
@@ -305,7 +347,7 @@ export function ProductsTable({
                   <tr className="border-b border-ms-border text-[12px] font-bold tracking-wide text-ms-text-muted uppercase">
                     {canEdit && (
                       <>
-                        <th className="w-10 py-3 pr-1 pl-4">
+                        <th className="w-8 py-3 pr-1 pl-3 sm:w-10 sm:pl-4">
                           <input
                             ref={selectAllRef}
                             type="checkbox"
@@ -315,17 +357,17 @@ export function ProductsTable({
                             className="size-4 accent-ms-accent"
                           />
                         </th>
-                        <th className="w-12 px-1 py-3">
+                        <th className="w-8 px-0 py-3 sm:w-12 sm:px-1">
                           <span className="sr-only">Ordre</span>
                         </th>
                       </>
                     )}
-                    <th className="px-3 py-3">Produit</th>
+                    <th className="px-2 py-3 sm:px-3">Produit</th>
                     <th className="hidden px-3 py-3 md:table-cell">Catégorie</th>
-                    <th className="hidden px-3 py-3 lg:table-cell">Dosages</th>
-                    <th className="hidden px-3 py-3 text-center lg:table-cell">Notices</th>
-                    <th className="px-3 py-3">Statut</th>
-                    <th className="px-4 py-3 text-right">
+                    <th className="hidden px-3 py-3 xl:table-cell">Dosages</th>
+                    <th className="hidden px-3 py-3 text-center xl:table-cell">Notices</th>
+                    <th className="hidden px-3 py-3 sm:table-cell">Statut</th>
+                    <th className="py-3 pr-2 text-right sm:px-4">
                       <span className="sr-only">Actions</span>
                     </th>
                   </tr>
@@ -356,7 +398,7 @@ export function ProductsTable({
                       >
                         {canEdit && (
                           <>
-                            <td className="py-3 pr-1 pl-4">
+                            <td className="py-3 pr-1 pl-3 sm:pl-4">
                               <input
                                 type="checkbox"
                                 checked={selected.has(product.id)}
@@ -365,7 +407,7 @@ export function ProductsTable({
                                 className="size-4 accent-ms-accent"
                               />
                             </td>
-                            <td className="px-1 py-3">
+                            <td className="px-0 py-3 sm:px-1">
                               <div
                                 className="flex flex-col items-center"
                                 title={isFiltered ? "Réinitialisez les filtres pour changer l’ordre" : undefined}
@@ -392,20 +434,31 @@ export function ProductsTable({
                             </td>
                           </>
                         )}
-                        <td className="px-3 py-3">
-                          <div className="flex items-center gap-3">
+                        <td className="px-2 py-3 sm:min-w-52 sm:px-3">
+                          <div className="flex items-center gap-2.5 sm:gap-3">
                             {/* eslint-disable-next-line @next/next/no-img-element -- simple miniature admin */}
                             <img
                               src={product.imageUrl}
                               alt=""
                               loading="lazy"
-                              className="size-11 shrink-0 rounded-md border border-ms-border bg-white object-contain"
+                              className="size-10 shrink-0 rounded-md sm:size-11 border border-ms-border bg-white object-contain"
                             />
                             <div className="min-w-0">
                               <Link href={editHref} className="font-semibold text-ms-primary hover:text-ms-accent">
                                 {product.name}
                               </Link>
-                              <p className="truncate text-[13px] text-ms-text-muted">{product.principeActif}</p>
+                              {/* Pas de `truncate` : dans un tableau, le nowrap impose toute la longueur du texte à la colonne. */}
+                              <p title={product.principeActif} className="line-clamp-2 text-[13px] text-ms-text-muted">
+                                {product.principeActif}
+                              </p>
+                              {/* Sur mobile, la colonne Statut est masquée : le badge passe sous le nom. */}
+                              <span
+                                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold sm:hidden ${
+                                  product.published ? "bg-ms-badge text-ms-primary" : "bg-zinc-100 text-zinc-500"
+                                }`}
+                              >
+                                {product.published ? "Publié" : "Brouillon"}
+                              </span>
                               {product.warnings.map((warning) => (
                                 <p key={warning} className="mt-0.5 text-[12px] font-medium text-amber-700">
                                   ⚠ {warning}
@@ -415,7 +468,7 @@ export function ProductsTable({
                           </div>
                         </td>
                         <td className="hidden px-3 py-3 text-ms-text md:table-cell">{CATEGORY_LABEL[product.category]}</td>
-                        <td className="hidden px-3 py-3 lg:table-cell">
+                        <td className="hidden px-3 py-3 xl:table-cell">
                           <div className="flex max-w-56 flex-wrap gap-1">
                             {product.dosages.length ? (
                               product.dosages.map((dosage) => (
@@ -428,8 +481,8 @@ export function ProductsTable({
                             )}
                           </div>
                         </td>
-                        <td className="hidden px-3 py-3 text-center text-ms-text lg:table-cell">{product.noticeCount}</td>
-                        <td className="px-3 py-3">
+                        <td className="hidden px-3 py-3 text-center text-ms-text xl:table-cell">{product.noticeCount}</td>
+                        <td className="hidden px-3 py-3 sm:table-cell">
                           <span
                             className={`rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
                               product.published ? "bg-ms-badge text-ms-primary" : "bg-zinc-100 text-zinc-500"
@@ -438,9 +491,10 @@ export function ProductsTable({
                             {product.published ? "Publié" : "Brouillon"}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="py-3 pr-2 sm:px-4">
                           <div className="flex items-center justify-end gap-2">
-                            <Link href={editHref} className="font-semibold text-ms-accent hover:text-ms-primary">
+                            {/* Sur mobile, le nom du produit fait office de lien de modification. */}
+                            <Link href={editHref} className="hidden font-semibold sm:inline text-ms-accent hover:text-ms-primary">
                               {canEdit ? "Modifier" : "Consulter"}
                             </Link>
                             {menuItems.length > 0 && (
@@ -486,7 +540,7 @@ export function ProductsTable({
       {toast && (
         <div
           role="status"
-          className={`fixed right-4 bottom-4 z-50 flex items-center gap-3 rounded-lg px-4 py-3 text-[14px] font-semibold text-white shadow-lg ${
+          className={`fixed right-4 bottom-4 left-4 z-50 sm:left-auto flex items-center gap-3 rounded-lg px-4 py-3 text-[14px] font-semibold text-white shadow-lg ${
             toast.kind === "success" ? "bg-ms-primary" : "bg-red-600"
           }`}
         >

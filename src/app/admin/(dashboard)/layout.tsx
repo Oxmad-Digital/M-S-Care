@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { MobileNav } from "@/components/admin/MobileNav";
 import { logoutAction } from "@/lib/actions/auth";
 import { displayName, getCurrentUser } from "@/lib/current-user";
 import { getSiteSettings } from "@/lib/site-settings";
@@ -12,6 +13,47 @@ const NAV_LINKS = [
   { href: "/admin/parametres", label: "Paramètres" },
 ];
 
+const itemClass =
+  "flex items-center gap-2 rounded-md px-3 py-2.5 text-[14.5px] font-medium transition hover:bg-ms-accent/10 hover:text-ms-primary";
+
+// Contenu commun à la barre latérale (ordinateur) et au tiroir (mobile, tablette).
+function SidebarContent({ user }: { user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>> }) {
+  return (
+    <>
+      <div className="border-b border-ms-border px-6 py-6">
+        <p className="text-lg font-extrabold text-ms-primary">M&amp;S Care</p>
+        <p className="text-xs text-ms-text-muted">Administration</p>
+      </div>
+      <nav className="flex flex-1 flex-col gap-1 p-4">
+        {NAV_LINKS.map((link) => (
+          <Link key={link.href} href={link.href} className={`${itemClass} text-ms-text`}>
+            {link.label}
+          </Link>
+        ))}
+      </nav>
+      <div className="border-t border-ms-border p-4">
+        <Link href="/" className={`${itemClass} text-ms-text-soft`}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M2 12h20" />
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+          </svg>
+          Voir le site
+        </Link>
+      </div>
+      <form action={logoutAction} className="border-t border-ms-border p-4">
+        <div className="px-3 pb-2">
+          <p className="truncate text-[13.5px] font-semibold text-ms-primary">{displayName(user)}</p>
+          <p className="text-xs text-ms-text-muted">{ROLE_LABEL[user.role]}</p>
+        </div>
+        <button type="submit" className={`${itemClass} w-full text-left text-ms-text-soft`}>
+          Déconnexion
+        </button>
+      </form>
+    </>
+  );
+}
+
 export default async function AdminDashboardLayout({
   children,
 }: {
@@ -23,50 +65,14 @@ export default async function AdminDashboardLayout({
   const { maintenance } = await getSiteSettings();
 
   return (
-    <div className="flex min-h-screen flex-col bg-ms-bg md:flex-row">
-      <aside className="sticky top-0 z-30 flex flex-wrap items-center border-b border-ms-border bg-white md:fixed md:inset-y-0 md:left-0 md:w-56 md:overflow-y-auto md:flex-col md:flex-nowrap md:items-stretch md:border-r md:border-b-0">
-        <div className="px-4 py-3 md:border-b md:border-ms-border md:px-6 md:py-6">
-          <p className="text-lg font-extrabold text-ms-primary">M&amp;S Care</p>
-          <p className="text-xs text-ms-text-muted">Administration</p>
-        </div>
-        <nav className="flex flex-1 gap-1 px-2 py-2 md:flex-col md:p-4">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="rounded-md px-3 py-2.5 text-[14.5px] font-medium text-ms-text transition hover:bg-ms-accent/10 hover:text-ms-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="px-2 py-2 md:border-t md:border-ms-border md:p-4">
-          <Link
-            href="/"
-            className="flex items-center gap-2 rounded-md px-3 py-2.5 text-[14.5px] font-medium text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
-              <circle cx="12" cy="12" r="10" />
-              <path d="M2 12h20" />
-              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
-            </svg>
-            Voir le site
-          </Link>
-        </div>
-        <form action={logoutAction} className="px-2 py-2 md:border-t md:border-ms-border md:p-4">
-          <div className="hidden px-3 pb-2 md:block">
-            <p className="truncate text-[13.5px] font-semibold text-ms-primary">{displayName(user)}</p>
-            <p className="text-xs text-ms-text-muted">{ROLE_LABEL[user.role]}</p>
-          </div>
-          <button
-            type="submit"
-            className="w-full rounded-md px-3 py-2.5 text-left text-[14.5px] font-medium text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
-          >
-            Déconnexion
-          </button>
-        </form>
+    <div className="flex min-h-screen flex-col bg-ms-bg lg:flex-row">
+      <MobileNav>
+        <SidebarContent user={user} />
+      </MobileNav>
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-56 flex-col overflow-y-auto border-r border-ms-border bg-white lg:flex">
+        <SidebarContent user={user} />
       </aside>
-      <main className="min-w-0 flex-1 p-4 md:ml-56 md:p-8">
+      <main className="min-w-0 flex-1 p-4 sm:p-6 lg:ml-56 lg:p-8">
         {maintenance && (
           <Link
             href="/admin/parametres#maintenance"
