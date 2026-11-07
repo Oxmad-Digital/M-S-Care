@@ -17,12 +17,19 @@ function sendDuration(id: string, token: string, duration: number) {
   }
 }
 
+// Le visiteur qui a activé « Global Privacy Control » ou « Do Not Track » dans son
+// navigateur s'oppose à la mesure d'audience : aucune vue n'est envoyée.
+function hasOptedOut() {
+  const nav = navigator as Navigator & { globalPrivacyControl?: boolean };
+  return nav.globalPrivacyControl === true || nav.doNotTrack === "1";
+}
+
 // Enregistre chaque page publique vue, puis le temps passé dessus quand on la quitte.
 export function Tracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!pathname || pathname.startsWith("/admin")) return;
+    if (!pathname || pathname.startsWith("/admin") || hasOptedOut()) return;
 
     const startedAt = Date.now();
     let view: { id: string; token: string } | null = null;

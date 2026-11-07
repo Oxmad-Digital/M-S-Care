@@ -15,6 +15,10 @@ import {
 export async function POST(request: NextRequest) {
   const { isBot, device } = userAgent(request);
   if (isBot) return NextResponse.json({ ok: true });
+  // Opposition exprimée par le navigateur (Global Privacy Control / Do Not Track) : rien n'est enregistré.
+  if (request.headers.get("sec-gpc") === "1" || request.headers.get("dnt") === "1") {
+    return NextResponse.json({ ok: true });
+  }
 
   let body: { path?: unknown; referrer?: unknown };
   try {

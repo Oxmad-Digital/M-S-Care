@@ -30,7 +30,13 @@ function formatDate(day: string, opts: Intl.DateTimeFormatOptions) {
   return new Date(`${day}T00:00:00Z`).toLocaleDateString("fr-FR", { ...opts, timeZone: "UTC" });
 }
 
-export function DailyTrafficChart({ daily }: { daily: DailyPoint[] }) {
+export function DailyTrafficChart({
+  daily,
+  granularity = "day",
+}: {
+  daily: DailyPoint[];
+  granularity?: "day" | "week";
+}) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [pointer, setPointer] = useState<{ x: number; y: number; wrapWidth: number } | null>(null);
@@ -170,7 +176,9 @@ export function DailyTrafficChart({ daily }: { daily: DailyPoint[] }) {
             }}
           >
             <div className="mb-1 text-[11px] text-white/70">
-              {formatDate(hovered.day, { weekday: "short", day: "2-digit", month: "long" })}
+              {granularity === "week"
+                ? `Semaine du ${formatDate(hovered.day, { day: "2-digit", month: "long", year: "numeric" })}`
+                : formatDate(hovered.day, { weekday: "short", day: "2-digit", month: "long" })}
             </div>
             {[
               { color: VIEWS_COLOR, value: hovered.views, label: "vues" },
@@ -198,10 +206,10 @@ export function DailyTrafficChart({ daily }: { daily: DailyPoint[] }) {
       </div>
 
       <table className="sr-only">
-        <caption>Trafic quotidien</caption>
+        <caption>{granularity === "week" ? "Trafic hebdomadaire" : "Trafic quotidien"}</caption>
         <thead>
           <tr>
-            <th>Jour</th>
+            <th>{granularity === "week" ? "Semaine du" : "Jour"}</th>
             <th>Vues</th>
             <th>Visiteurs uniques</th>
           </tr>
@@ -209,7 +217,7 @@ export function DailyTrafficChart({ daily }: { daily: DailyPoint[] }) {
         <tbody>
           {daily.map((d) => (
             <tr key={d.day}>
-              <td>{formatDate(d.day, { day: "2-digit", month: "long" })}</td>
+              <td>{formatDate(d.day, { day: "2-digit", month: "long", year: granularity === "week" ? "numeric" : undefined })}</td>
               <td>{d.views}</td>
               <td>{d.visitors}</td>
             </tr>

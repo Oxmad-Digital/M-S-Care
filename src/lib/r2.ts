@@ -34,6 +34,25 @@ export function getR2Bucket(kind: R2BucketKind): R2Bucket {
   return bucket;
 }
 
+// Bucket privé des archives de statistiques : jamais d'URL publique, accès uniquement
+// avec les clés du serveur.
+let archiveBucket: { client: S3Client; bucket: string } | undefined;
+
+export function getR2ArchiveBucket() {
+  archiveBucket ??= {
+    client: new S3Client({
+      region: "auto",
+      endpoint: requireEnv("R2_ENDPOINT"),
+      credentials: {
+        accessKeyId: requireEnv("R2_ARCHIVE_ACCESS_KEY_ID"),
+        secretAccessKey: requireEnv("R2_ARCHIVE_SECRET_ACCESS_KEY"),
+      },
+    }),
+    bucket: requireEnv("R2_ARCHIVE_BUCKET"),
+  };
+  return archiveBucket;
+}
+
 export function publicUrlFor(kind: R2BucketKind, key: string): string {
   const encoded = key.split("/").map(encodeURIComponent).join("/");
   return `${getR2Bucket(kind).publicUrl}/${encoded}`;

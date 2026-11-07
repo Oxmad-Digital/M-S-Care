@@ -77,7 +77,7 @@ export function StatsView({ stats, rangeDays }: { stats: Stats; rangeDays: Stats
                 range === rangeDays ? "bg-ms-accent text-white" : "text-ms-text hover:text-ms-primary"
               }`}
             >
-              {range} jours
+              {range === 365 ? "1 an" : `${range} jours`}
             </Link>
           ))}
         </nav>
@@ -94,8 +94,8 @@ export function StatsView({ stats, rangeDays }: { stats: Stats; rangeDays: Stats
         <Kpi label="Durée moyenne / page" value={formatDuration(stats.avgDurationMs)} />
       </div>
 
-      <Card title="Trafic quotidien">
-        <DailyTrafficChart daily={stats.daily} />
+      <Card title={stats.granularity === "week" ? "Trafic hebdomadaire" : "Trafic quotidien"}>
+        <DailyTrafficChart daily={stats.traffic} granularity={stats.granularity} />
       </Card>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-[1.2fr_0.9fr_0.7fr]">

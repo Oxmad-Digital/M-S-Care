@@ -109,6 +109,8 @@ model ContactMessage {
 }
 
 // Vue de page publique, enregistrée par /api/track (sans cookie ni IP en clair).
+// visitorHash est effacé à la consolidation de la journée, la ligne archivée dans R2 après 90 jours
+// (voir src/lib/stats-rollup.ts).
 model PageView {
   id          String   @id @default(cuid())
   // Jour UTC (AAAA-MM-JJ) : sert au regroupement et au hash visiteur, qui change chaque jour.
@@ -124,4 +126,28 @@ model PageView {
 
   @@index([day])
   @@index([day, path])
+}
+
+// Totaux d'une journée UTC close, calculés chaque nuit à partir des PageView.
+// Données anonymes (simples compteurs) : conservées sans limite de durée.
+model StatDay {
+  day           String   @id
+  views         Int
+  visitors      Int
+  // Somme et nombre des durées connues, pour recalculer une moyenne sur n'importe quelle période.
+  durationSum   Float    @default(0)
+  durationCount Int      @default(0)
+  createdAt     DateTime @default(now())
+}
+
+// Vues d'une journée close ventilées par critère : page, provenance, appareil ou pays.
+model StatDimension {
+  day       String
+  // "path" | "referrer" | "deviceType" | "country" ; value vide = accès direct / pays inconnu.
+  dimension String
+  value     String
+  views     Int
+
+  @@id([day, dimension, value])
+  @@index([dimension, day])
 }
