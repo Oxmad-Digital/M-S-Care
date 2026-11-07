@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { m } from "motion/react";
 import { submitContactForm, type ContactFormState } from "@/lib/actions/contact";
+import { CONTACT_SUBJECTS, HONEYPOT_FIELD, STARTED_AT_FIELD } from "@/lib/contact";
 
 const initialState: ContactFormState = { status: "idle" };
 
@@ -14,12 +15,25 @@ export function ContactForm() {
     submitContactForm,
     initialState,
   );
+  // Posé après l'hydratation : un envoi trop rapide (ou sans JavaScript) est écarté comme robot.
+  const startedAtRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (startedAtRef.current) startedAtRef.current.value = String(Date.now());
+  }, []);
 
   return (
     <form
       action={formAction}
       className="grid gap-[18px] rounded-2xl border border-ms-accent/18 bg-ms-bg p-6 sm:p-9"
     >
+      <input ref={startedAtRef} type="hidden" name={STARTED_AT_FIELD} defaultValue="" />
+      {/* Champ piège : hors écran et hors tabulation, seuls les robots le remplissent. */}
+      <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+        <label>
+          Site web
+          <input type="text" name={HONEYPOT_FIELD} tabIndex={-1} autoComplete="off" defaultValue="" />
+        </label>
+      </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <label className="grid gap-2">
           <span className="text-[12.5px] font-semibold text-ms-text">Prénom</span>
@@ -50,10 +64,9 @@ export function ContactForm() {
           <option value="" disabled>
             Sélectionnez un objet
           </option>
-          <option>Service commercial</option>
-          <option>Service commande</option>
-          <option>Service livraison</option>
-          <option>Autre</option>
+          {CONTACT_SUBJECTS.map((subject) => (
+            <option key={subject}>{subject}</option>
+          ))}
         </select>
       </label>
       <label className="grid gap-2">

@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
+import { detectSpam, HONEYPOT_FIELD, STARTED_AT_FIELD } from "@/lib/contact";
 import { appUrl, sendEmail } from "@/lib/email";
 import { contactAcknowledgmentEmail, contactNotificationEmail, type ContactDetails } from "@/lib/email-templates";
 
@@ -44,6 +45,17 @@ export async function submitContactForm(
 
   if (!firstName || !lastName || !email || !subject || !message) {
     return { status: "error", error: "Merci de remplir tous les champs obligatoires." };
+  }
+
+  // Robot détecté : on simule un succès pour ne rien lui apprendre, sans enregistrer ni envoyer d'e-mail.
+  const spam = detectSpam({
+    honeypot: String(formData.get(HONEYPOT_FIELD) ?? ""),
+    startedAt: String(formData.get(STARTED_AT_FIELD) ?? ""),
+    email,
+  });
+  if (spam) {
+    console.warn(`Formulaire de contact ignoré (${spam}) : ${email}`);
+    return { status: "success" };
   }
 
   await prisma.contactMessage.create({

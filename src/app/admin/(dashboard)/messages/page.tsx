@@ -1,71 +1,156 @@
+import Link from "next/link";
+import type { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { markMessageRead } from "@/lib/actions/messages";
 import { requireUser } from "@/lib/current-user";
 import { can } from "@/lib/permissions";
+import { CONTACT_SUBJECTS } from "@/lib/contact";
+import { MessageCard, type AdminMessage } from "@/components/admin/MessageCard";
 
 export const dynamic = "force-dynamic";
 
-export default async function AdminMessagesPage() {
+const TIME_ZONE = "Indian/Antananarivo";
+
+const VIEWS = [
+  { key: "a-traiter", label: "À traiter", where: { read: false } },
+  { key: "traites", label: "Traités", where: { read: true } },
+  { key: "tous", label: "Tous", where: {} },
+] as const satisfies readonly { key: string; label: string; where: Prisma.ContactMessageWhereInput }[];
+type ViewKey = (typeof VIEWS)[number]["key"];
+
+function first(value: string | string[] | undefined) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+const fullDate = new Intl.DateTimeFormat("fr-FR", { dateStyle: "full", timeStyle: "short", timeZone: TIME_ZONE });
+const shortDate = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "short", timeZone: TIME_ZONE });
+const hour = new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit", timeZone: TIME_ZONE });
+const relative = new Intl.RelativeTimeFormat("fr-FR", { numeric: "auto" });
+const dayKey = new Intl.DateTimeFormat("en-CA", { timeZone: TIME_ZONE });
+
+// « il y a 12 min », « aujourd'hui, 11:17 », « hier, 21:13 », « il y a 3 jours », puis la date.
+function receivedLabel(date: Date, now: Date) {
+  const minutes = Math.round((now.getTime() - date.getTime()) / 60_000);
+  if (minutes < 60) return minutes < 1 ? "à l’instant" : relative.format(-minutes, "minute");
+  const days = Math.round(
+    (Date.parse(dayKey.format(now)) - Date.parse(dayKey.format(date))) / 86_400_000,
+  );
+  if (days === 0) return `aujourd’hui, ${hour.format(date)}`;
+  if (days === 1) return `hier, ${hour.format(date)}`;
+  if (days < 7) return relative.format(-days, "day");
+  return shortDate.format(date);
+}
+
+export default async function AdminMessagesPage({ searchParams }: PageProps<"/admin/messages">) {
   const user = await requireUser();
-  const canEdit = can(user.role, "edit");
-  const messages = await prisma.contactMessage.findMany({
-    orderBy: { createdAt: "desc" },
-  });
+  const params = await searchParams;
+  const viewParam = first(params.vue);
+  const view = VIEWS.find((v) => v.key === viewParam) ?? VIEWS[0];
+  const subjectParam = first(params.objet);
+  const subject = CONTACT_SUBJECTS.find((s) => s === subjectParam);
+
+  const [messages, unread, total] = await Promise.all([
+    prisma.contactMessage.findMany({
+      where: { ...view.where, ...(subject ? { subject } : {}) },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.contactMessage.count({ where: { read: false } }),
+    prisma.contactMessage.count(),
+  ]);
+  const counts: Record<ViewKey, number> = { "a-traiter": unread, traites: total - unread, tous: total };
+
+  const href = (next: { vue?: ViewKey; objet?: string | null }) => {
+    const query = new URLSearchParams();
+    const vue = next.vue ?? view.key;
+    const objet = next.objet === undefined ? subject : next.objet;
+    if (vue !== VIEWS[0].key) query.set("vue", vue);
+    if (objet) query.set("objet", objet);
+    const qs = query.toString();
+    return qs ? `/admin/messages?${qs}` : "/admin/messages";
+  };
+
+  const now = new Date();
+  const rows: AdminMessage[] = messages.map((message) => ({
+    id: message.id,
+    name: `${message.firstName} ${message.lastName}`.trim(),
+    email: message.email,
+    phone: message.phone,
+    subject: message.subject,
+    message: message.message,
+    read: message.read,
+    receivedLabel: receivedLabel(message.createdAt, now),
+    receivedFull: fullDate.format(message.createdAt),
+    receivedIso: message.createdAt.toISOString(),
+  }));
+
+  const chip = (active: boolean) =>
+    `rounded-full border px-3 py-1 text-[12.5px] font-semibold transition ${
+      active
+        ? "border-ms-primary bg-ms-primary text-white"
+        : "border-ms-accent/30 bg-white text-ms-text-soft hover:bg-ms-accent/10 hover:text-ms-primary"
+    }`;
 
   return (
-    <div>
-      <h1 className="mb-6 text-2xl font-extrabold text-ms-primary">
-        Messages de contact
-      </h1>
+    <div className="max-w-4xl">
+      <h1 className="text-2xl font-extrabold text-ms-primary">Messages de contact</h1>
+      <p className="mt-1 text-[14px] text-ms-text-soft">
+        {unread === 0
+          ? "Tout est traité."
+          : `${unread} message${unread > 1 ? "s" : ""} à traiter.`}
+      </p>
 
-      {messages.length === 0 ? (
-        <p className="text-ms-text-soft">Aucun message pour le moment.</p>
-      ) : (
-        <div className="grid gap-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`rounded-lg border bg-white p-5 ${
-                message.read ? "border-ms-border" : "border-ms-accent"
+      <nav aria-label="Statut" className="mt-6 flex gap-1 border-b border-ms-border">
+        {VIEWS.map((v) => {
+          const active = v.key === view.key;
+          return (
+            <Link
+              key={v.key}
+              href={href({ vue: v.key })}
+              aria-current={active ? "page" : undefined}
+              className={`-mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-[14px] font-semibold transition ${
+                active
+                  ? "border-ms-accent text-ms-primary"
+                  : "border-transparent text-ms-text-soft hover:text-ms-primary"
               }`}
             >
-              <div className="mb-2 flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="font-semibold text-ms-primary">
-                    {message.firstName} {message.lastName}{" "}
-                    <span className="font-normal text-ms-text-soft">
-                      — {message.subject}
-                    </span>
-                  </p>
-                  <p className="text-[13px] text-ms-text-muted">
-                    {message.email}
-                    {message.phone ? ` · ${message.phone}` : ""} ·{" "}
-                    {new Intl.DateTimeFormat("fr-FR", {
-                      dateStyle: "medium",
-                      timeStyle: "short",
-                    }).format(message.createdAt)}
-                  </p>
-                </div>
-                {canEdit && (
-                  <form
-                    action={async () => {
-                      "use server";
-                      await markMessageRead(message.id, !message.read);
-                    }}
-                  >
-                    <button
-                      type="submit"
-                      className="rounded-full border border-ms-accent/30 px-3.5 py-1.5 text-xs font-semibold text-ms-primary transition hover:bg-ms-accent/10"
-                    >
-                      {message.read ? "Marquer non lu" : "Marquer comme lu"}
-                    </button>
-                  </form>
-                )}
-              </div>
-              <p className="text-[14.5px] leading-[1.6] text-ms-text">
-                {message.message}
-              </p>
-            </div>
+              {v.label}
+              <span
+                className={`rounded-full px-1.5 py-px text-[11.5px] ${
+                  active ? "bg-ms-accent text-white" : "bg-ms-badge text-ms-text-soft"
+                }`}
+              >
+                {counts[v.key]}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      <div className="mt-4 flex flex-wrap gap-2" aria-label="Filtrer par objet" role="group">
+        <Link href={href({ objet: null })} className={chip(!subject)} aria-current={!subject ? "true" : undefined}>
+          Tous les objets
+        </Link>
+        {CONTACT_SUBJECTS.map((s) => (
+          <Link key={s} href={href({ objet: s })} className={chip(subject === s)} aria-current={subject === s ? "true" : undefined}>
+            {s}
+          </Link>
+        ))}
+      </div>
+
+      {rows.length === 0 ? (
+        <p className="mt-10 rounded-lg border border-dashed border-ms-border bg-white px-5 py-10 text-center text-ms-text-soft">
+          {view.key === "a-traiter" && !subject
+            ? "Aucun message en attente."
+            : "Aucun message ne correspond à ce filtre."}
+        </p>
+      ) : (
+        <div className="mt-5 grid gap-3">
+          {rows.map((row) => (
+            <MessageCard
+              key={row.id}
+              message={row}
+              canEdit={can(user.role, "edit")}
+              canDelete={can(user.role, "delete")}
+            />
           ))}
         </div>
       )}
