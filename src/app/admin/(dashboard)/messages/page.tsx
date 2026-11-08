@@ -83,7 +83,7 @@ export default async function AdminMessagesPage({ searchParams }: PageProps<"/ad
   }));
 
   const chip = (active: boolean) =>
-    `rounded-full border px-3 py-1 text-[12.5px] font-semibold transition ${
+    `shrink-0 whitespace-nowrap rounded-lg border px-3 py-1.5 text-[12.5px] sm:py-1 font-semibold transition ${
       active
         ? "border-ms-primary bg-ms-primary text-white"
         : "border-ms-accent/30 bg-white text-ms-text-soft hover:bg-ms-accent/10 hover:text-ms-primary"
@@ -98,7 +98,7 @@ export default async function AdminMessagesPage({ searchParams }: PageProps<"/ad
           : `${unread} message${unread > 1 ? "s" : ""} à traiter.`}
       </p>
 
-      <nav aria-label="Statut" className="mt-6 flex gap-1 border-b border-ms-border">
+      <nav aria-label="Statut" className="mt-6 flex border-b border-ms-border sm:gap-1">
         {VIEWS.map((v) => {
           const active = v.key === view.key;
           return (
@@ -106,7 +106,7 @@ export default async function AdminMessagesPage({ searchParams }: PageProps<"/ad
               key={v.key}
               href={href({ vue: v.key })}
               aria-current={active ? "page" : undefined}
-              className={`-mb-px flex items-center gap-2 border-b-2 px-3 py-2 text-[14px] font-semibold transition ${
+              className={`-mb-px flex flex-1 items-center justify-center gap-2 whitespace-nowrap border-b-2 px-2 py-2.5 sm:flex-none sm:px-3 sm:py-2 text-[14px] font-semibold transition ${
                 active
                   ? "border-ms-accent text-ms-primary"
                   : "border-transparent text-ms-text-soft hover:text-ms-primary"
@@ -125,7 +125,12 @@ export default async function AdminMessagesPage({ searchParams }: PageProps<"/ad
         })}
       </nav>
 
-      <div className="mt-4 flex flex-wrap gap-2" aria-label="Filtrer par objet" role="group">
+      {/* Sur mobile, les objets défilent sur une ligne plutôt que d'empiler plusieurs rangées. */}
+      <div
+        className="-mx-4 mt-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 [&::-webkit-scrollbar]:hidden"
+        aria-label="Filtrer par objet"
+        role="group"
+      >
         <Link href={href({ objet: null })} className={chip(!subject)} aria-current={!subject ? "true" : undefined}>
           Tous les objets
         </Link>
@@ -143,7 +148,7 @@ export default async function AdminMessagesPage({ searchParams }: PageProps<"/ad
             : "Aucun message ne correspond à ce filtre."}
         </p>
       ) : (
-        <div className="mt-5 grid gap-3">
+        <div className="mt-5 flex flex-col gap-3">
           {rows.map((row) => (
             <MessageCard
               key={row.id}

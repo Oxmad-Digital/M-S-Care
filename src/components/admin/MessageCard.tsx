@@ -20,8 +20,25 @@ export type AdminMessage = {
 // Au-delà, le message est replié sur trois lignes avec « Voir plus ».
 const LONG_MESSAGE = 220;
 
+// Actions en simples liens texte avec icône : plus légères qu'une rangée de boutons pleins.
 const actionClass =
-  "inline-flex items-center gap-1.5 rounded-full border border-ms-accent/30 px-3.5 py-1.5 text-xs font-semibold text-ms-primary transition hover:bg-ms-accent/10 disabled:opacity-50";
+  "inline-flex items-center gap-1.5 rounded-md px-2 py-2 text-[13px] font-semibold text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary disabled:opacity-50 sm:py-1.5";
+
+function Icon({ d }: { d: string }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="size-4 shrink-0">
+      <path d={d} />
+    </svg>
+  );
+}
+
+const ICONS = {
+  reply: "M9 17 4 12l5-5M4 12h11a5 5 0 0 1 5 5v2",
+  phone: "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z",
+  check: "M20 6 9 17l-5-5",
+  undo: "M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13",
+  trash: "M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6",
+};
 
 export function MessageCard({
   message,
@@ -46,28 +63,30 @@ export function MessageCard({
 
   return (
     <article
-      className={`relative rounded-lg border bg-white p-4 transition-opacity sm:p-5 ${
+      className={`relative min-w-0 rounded-lg border bg-white p-4 transition-opacity sm:p-5 ${
         message.read ? "border-ms-border" : "border-ms-accent/40"
       } ${pending ? "opacity-60" : ""}`}
     >
-      <header className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-        <div className="flex min-w-0 items-center gap-2">
-          {!message.read && (
-            <span className="size-2 shrink-0 rounded-full bg-ms-accent" aria-label="Non lu" role="img" />
-          )}
-          <p className={`truncate text-[15px] text-ms-primary ${message.read ? "font-semibold" : "font-extrabold"}`}>
-            {message.name}
-          </p>
+      <header className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-1">
+          <span className="flex min-w-0 max-w-full items-center gap-2">
+            {!message.read && (
+              <span className="size-2 shrink-0 rounded-full bg-ms-accent" aria-label="Non lu" role="img" />
+            )}
+            <span className={`truncate text-[15px] text-ms-primary ${message.read ? "font-semibold" : "font-extrabold"}`}>
+              {message.name}
+            </span>
+          </span>
           <span className="shrink-0 rounded-full bg-ms-badge px-2.5 py-0.5 text-[11.5px] font-semibold text-ms-primary">
             {message.subject}
           </span>
         </div>
-        <time dateTime={message.receivedIso} title={message.receivedFull} className="shrink-0 text-[12.5px] text-ms-text-muted">
+        <time dateTime={message.receivedIso} title={message.receivedFull} className="shrink-0 pt-0.5 text-[12.5px] text-ms-text-muted">
           {message.receivedLabel}
         </time>
       </header>
 
-      <p className="mt-1 flex flex-wrap gap-x-3 text-[13px] text-ms-text-muted">
+      <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] text-ms-text-muted">
         <a href={`mailto:${message.email}`} className="break-all hover:text-ms-primary hover:underline">
           {message.email}
         </a>
@@ -79,7 +98,7 @@ export function MessageCard({
       </p>
 
       <p
-        className={`mt-3 text-[14.5px] leading-[1.6] whitespace-pre-line text-ms-text ${
+        className={`mt-3 text-[14.5px] leading-[1.6] whitespace-pre-line text-ms-text [overflow-wrap:anywhere] ${
           long && !expanded ? "line-clamp-3" : ""
         }`}
       >
@@ -95,21 +114,22 @@ export function MessageCard({
         </button>
       )}
 
-      <footer className="mt-4 flex flex-wrap items-center gap-2">
-        <a
-          href={`mailto:${message.email}?subject=${replySubject}`}
-          className={`${actionClass} border-ms-accent bg-ms-accent text-white hover:bg-ms-primary`}
-        >
+      <footer className="-mx-2 mt-3 flex flex-wrap items-center gap-x-1 border-t border-ms-border pt-2">
+        <a href={`mailto:${message.email}?subject=${replySubject}`} className={`${actionClass} text-ms-accent`}>
+          <Icon d={ICONS.reply} />
           Répondre
         </a>
         {message.phone && (
           <a href={`tel:${message.phone.replace(/[^\d+]/g, "")}`} className={actionClass}>
+            <Icon d={ICONS.phone} />
             Appeler
           </a>
         )}
         {canEdit && (
           <button type="button" onClick={toggleRead} disabled={pending} className={actionClass}>
-            {message.read ? "Marquer non lu" : "Marquer comme traité"}
+            <Icon d={message.read ? ICONS.undo : ICONS.check} />
+            <span className="sm:hidden">{message.read ? "Non lu" : "Traité"}</span>
+            <span className="hidden sm:inline">{message.read ? "Marquer non lu" : "Marquer comme traité"}</span>
           </button>
         )}
         {canDelete && (
@@ -117,9 +137,11 @@ export function MessageCard({
             type="button"
             onClick={() => setConfirming(true)}
             disabled={pending}
-            className="ml-auto rounded-full px-3 py-1.5 text-xs font-semibold text-red-600 transition hover:bg-red-50 hover:text-red-700 disabled:opacity-50"
+            aria-label="Supprimer"
+            title="Supprimer"
+            className={`${actionClass} ml-auto hover:bg-red-50 hover:text-red-600`}
           >
-            Supprimer
+            <Icon d={ICONS.trash} />
           </button>
         )}
       </footer>
