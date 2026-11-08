@@ -453,7 +453,7 @@ export function ProductsTable({
                               </p>
                               {/* Sur mobile, la colonne Statut est masquée : le badge passe sous le nom. */}
                               <span
-                                className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold sm:hidden ${
+                                className={`mt-1 inline-block rounded-lg px-2 py-0.5 text-[11px] font-semibold sm:hidden ${
                                   product.published ? "bg-ms-badge text-ms-primary" : "bg-zinc-100 text-zinc-500"
                                 }`}
                               >
@@ -484,7 +484,7 @@ export function ProductsTable({
                         <td className="hidden px-3 py-3 text-center text-ms-text xl:table-cell">{product.noticeCount}</td>
                         <td className="hidden px-3 py-3 sm:table-cell">
                           <span
-                            className={`rounded-full px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
+                            className={`rounded-lg px-2.5 py-1 text-xs font-semibold whitespace-nowrap ${
                               product.published ? "bg-ms-badge text-ms-primary" : "bg-zinc-100 text-zinc-500"
                             }`}
                           >

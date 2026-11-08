@@ -159,7 +159,7 @@ export function Header({ overlay = false }: HeaderProps) {
             })}
             <Link
               href="/#contacts"
-              className={`btn-fill ml-4 rounded-full px-[22px] py-[12px] text-[14.5px] font-semibold transition-colors ${
+              className={`btn-fill ml-4 rounded-xl px-[22px] py-[12px] text-[14.5px] font-semibold transition-colors ${
                 transparent
                   ? "bg-white text-ms-primary [--btn-fill:var(--color-ms-mint)]"
                   : "bg-ms-accent text-white"
@@ -235,7 +235,7 @@ export function Header({ overlay = false }: HeaderProps) {
             <Link
               href="/#contacts"
               onClick={closeMenu}
-              className="btn-fill mt-4 block rounded-full bg-ms-accent px-[22px] py-[14px] text-center text-[15px] font-semibold text-white"
+              className="btn-fill mt-4 block rounded-2xl bg-ms-accent px-[22px] py-[14px] text-center text-[15px] font-semibold text-white"
             >
               Nous contacter
             </Link>

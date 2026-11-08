@@ -105,7 +105,7 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Consulter la notice du produit, dosage ${activeDosage}`}
-                className="btn-fill rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
+                className="btn-fill rounded-2xl bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
               >
                 Consulter la notice du produit
               </a>
@@ -124,7 +124,7 @@ export function ProductDetail({ product, initialDosage }: { product: CataloguePr
                   rel="noopener noreferrer"
                   aria-label={description}
                   title={description}
-                  className="btn-fill rounded-full bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
+                  className="btn-fill rounded-2xl bg-ms-accent px-[26px] py-[15px] text-[15px] font-semibold text-white"
                 >
                   Consulter la notice du produit
                 </a>

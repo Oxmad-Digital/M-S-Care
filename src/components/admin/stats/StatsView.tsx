@@ -67,13 +67,13 @@ export function StatsView({ stats, rangeDays }: { stats: Stats; rangeDays: Stats
             Fréquentation du site public, sans cookie. Les visites de l’équipe connectée ne sont pas comptées.
           </p>
         </div>
-        <nav className="flex rounded-full border border-ms-border bg-white p-1" aria-label="Période">
+        <nav className="flex rounded-lg border border-ms-border bg-white p-1" aria-label="Période">
           {STATS_RANGES.map((range) => (
             <Link
               key={range}
               href={`/admin/stats?periode=${range}`}
               aria-current={range === rangeDays ? "page" : undefined}
-              className={`rounded-full px-4 py-1.5 text-[13px] font-semibold transition ${
+              className={`rounded-md px-4 py-1.5 text-[13px] font-semibold transition ${
                 range === rangeDays ? "bg-ms-accent text-white" : "text-ms-text hover:text-ms-primary"
               }`}
             >

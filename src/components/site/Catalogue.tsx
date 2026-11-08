@@ -74,7 +74,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
                   setFilter(tab.key);
                   setLimit(PAGE_SIZE);
                 }}
-                className={`relative isolate rounded-full border px-[18px] py-[10px] text-sm font-semibold transition-colors duration-300 ${
+                className={`relative isolate rounded-xl border px-[18px] py-[10px] text-sm font-semibold transition-colors duration-300 ${
                   active
                     ? "border-ms-accent text-white"
                     : "border-ms-accent/28 bg-transparent text-ms-text hover:border-ms-accent hover:bg-white"
@@ -85,7 +85,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
                   <m.span
                     layoutId="catalogue-tab"
                     aria-hidden="true"
-                    className="absolute -inset-px -z-10 rounded-full bg-ms-accent"
+                    className="absolute -inset-px -z-10 rounded-xl bg-ms-accent"
                     transition={{ type: "spring", bounce: 0.18, duration: 0.55 }}
                   />
                 )}
@@ -94,7 +94,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
             );
           })}
         </div>
-        <label className="flex h-12 min-w-0 flex-1 basis-full items-center gap-3 rounded-full border border-ms-accent/22 bg-white px-5 focus-within:border-ms-accent lg:basis-[320px]">
+        <label className="flex h-12 min-w-0 flex-1 basis-full items-center gap-3 rounded-2xl border border-ms-accent/22 bg-white px-5 focus-within:border-ms-accent lg:basis-[320px]">
           <span className="sr-only">Rechercher par nom ou principe actif</span>
           <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5 shrink-0 fill-none stroke-ms-text-soft" strokeWidth="1.5" strokeLinecap="round">
             <circle cx="10.5" cy="10.5" r="6.5" /><path d="m16 16 4 4" />
@@ -157,7 +157,7 @@ export function Catalogue({ products }: { products: CatalogueProduct[] }) {
           <button
             type="button"
             onClick={() => setLimit(filtered.length)}
-            className="btn-fill rounded-full bg-ms-accent px-[34px] py-[15px] text-[15px] font-semibold text-white"
+            className="btn-fill rounded-2xl bg-ms-accent px-[34px] py-[15px] text-[15px] font-semibold text-white"
           >
             Voir plus
           </button>

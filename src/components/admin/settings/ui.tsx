@@ -4,7 +4,7 @@ export const fieldClass =
   "h-11 w-full rounded-md border border-ms-accent/24 bg-white px-3 text-[15px] outline-none focus:border-ms-accent disabled:bg-ms-bg disabled:text-ms-text-muted";
 
 export const buttonClass =
-  "h-11 w-fit rounded-full bg-ms-accent px-6 text-[14.5px] font-semibold text-white transition hover:bg-ms-primary disabled:opacity-60";
+  "h-11 w-fit rounded-lg bg-ms-accent px-6 text-[14.5px] font-semibold text-white transition hover:bg-ms-primary disabled:opacity-60";
 
 export function Section({
   id,

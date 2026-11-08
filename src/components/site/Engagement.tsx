@@ -44,7 +44,7 @@ export function Engagement() {
             </p>
             </RevealItem>
             <RevealItem>
-              <a href="#contacts" className="btn-fill mt-8 inline-flex items-center gap-3 rounded-full bg-ms-accent px-6 py-3.5 text-sm font-semibold text-white">
+              <a href="#contacts" className="btn-fill mt-8 inline-flex items-center gap-3 rounded-2xl bg-ms-accent px-6 py-3.5 text-sm font-semibold text-white">
                 Échangeons sur vos besoins
               </a>
             </RevealItem>

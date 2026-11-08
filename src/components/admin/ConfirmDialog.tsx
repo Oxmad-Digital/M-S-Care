@@ -43,14 +43,14 @@ export function ConfirmDialog({
           type="button"
           autoFocus
           onClick={onCancel}
-          className="rounded-full px-4 py-2 text-sm font-semibold text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
+          className="rounded-lg px-4 py-2 text-sm font-semibold text-ms-text-soft transition hover:bg-ms-accent/10 hover:text-ms-primary"
         >
           Annuler
         </button>
         <button
           type="button"
           onClick={onConfirm}
-          className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+          className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
         >
           {confirmLabel}
         </button>
