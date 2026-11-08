@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { MIN_PASSWORD_LENGTH, type ActionState } from "@/lib/action-state";
 import { buttonClass, Feedback, Field, fieldClass } from "./settings/ui";
+import { PasswordInput } from "./PasswordInput";
 
 export function AcceptInvitationForm({
   email,
@@ -27,10 +28,10 @@ export function AcceptInvitationForm({
         </Field>
       </div>
       <Field label={`Mot de passe (${MIN_PASSWORD_LENGTH} caractères minimum)`}>
-        <input name="password" type="password" required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" className={fieldClass} />
+        <PasswordInput name="password" required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" className={fieldClass} />
       </Field>
       <Field label="Confirmer le mot de passe">
-        <input name="confirmPassword" type="password" required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" className={fieldClass} />
+        <PasswordInput name="confirmPassword" required minLength={MIN_PASSWORD_LENGTH} autoComplete="new-password" className={fieldClass} />
       </Field>
       <Feedback state={state} />
       <button type="submit" disabled={pending} className={`${buttonClass.replace("w-fit", "w-full")} mt-2`}>

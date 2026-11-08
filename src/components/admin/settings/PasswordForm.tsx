@@ -4,6 +4,7 @@ import { useActionState, useEffect, useRef } from "react";
 import { changePassword } from "@/lib/actions/account";
 import { MIN_PASSWORD_LENGTH } from "@/lib/action-state";
 import { buttonClass, Feedback, Field, fieldClass } from "./ui";
+import { PasswordInput } from "../PasswordInput";
 
 export function PasswordForm() {
   const [state, action, pending] = useActionState(changePassword, {});
@@ -17,13 +18,12 @@ export function PasswordForm() {
     <form ref={formRef} action={action} className="grid gap-4 @md:grid-cols-2">
       <div className="@md:col-span-2">
         <Field label="Mot de passe actuel">
-          <input name="currentPassword" type="password" required autoComplete="current-password" className={fieldClass} />
+          <PasswordInput name="currentPassword" required autoComplete="current-password" className={fieldClass} />
         </Field>
       </div>
       <Field label="Nouveau mot de passe">
-        <input
+        <PasswordInput
           name="newPassword"
-          type="password"
           required
           minLength={MIN_PASSWORD_LENGTH}
           autoComplete="new-password"
@@ -31,9 +31,8 @@ export function PasswordForm() {
         />
       </Field>
       <Field label="Confirmer le nouveau mot de passe">
-        <input
+        <PasswordInput
           name="confirmPassword"
-          type="password"
           required
           minLength={MIN_PASSWORD_LENGTH}
           autoComplete="new-password"

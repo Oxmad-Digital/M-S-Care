@@ -3,6 +3,7 @@ import { findValidInvitation } from "@/lib/invitations";
 import { acceptInvitation } from "@/lib/actions/invitation";
 import { ROLE_DESCRIPTION, ROLE_LABEL } from "@/lib/permissions";
 import { AcceptInvitationForm } from "@/components/admin/AcceptInvitationForm";
+import { AuthLayout } from "@/components/admin/AuthLayout";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +12,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
   const invitation = await findValidInvitation(token);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-ms-bg px-5 py-10">
+    <AuthLayout>
       <div className="w-full max-w-md rounded-lg border border-ms-border bg-white p-8 shadow-sm">
         <h1 className="mb-1 text-2xl font-extrabold text-ms-primary">M&amp;S Care</h1>
         {invitation ? (
@@ -35,6 +36,6 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
           </>
         )}
       </div>
-    </div>
+    </AuthLayout>
   );
 }
