@@ -23,7 +23,7 @@ export function HeroProductCard({ products, className = "" }: { products: Catalo
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className={`group relative hidden w-[380px] flex-none rounded-2xl border border-white/15 bg-white/10 p-4 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl transition hover:border-white/30 hover:bg-white/15 lg:block ${className}`}
+      className={`group relative hidden w-[380px] flex-none rounded-2xl border border-white/20 bg-white/20 p-4 shadow-[0_24px_60px_-30px_rgba(0,0,0,0.6)] backdrop-blur-xl transition hover:border-white/35 hover:bg-white/25 lg:block ${className}`}
     >
       {/* Les deux produits se superposent dans la même cellule pendant le fondu croisé. */}
       <div className="grid grid-cols-[minmax(0,1fr)]">

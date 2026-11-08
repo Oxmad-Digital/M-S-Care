@@ -56,10 +56,9 @@ export function Hero({ products }: { products: CatalogueProduct[] }) {
           <div className={`${styles.actions} mt-8 flex flex-wrap gap-3 sm:mt-12`}>
             <a
               href="#nosproduits"
-              className="btn-fill group inline-flex items-center justify-center gap-4 rounded-full bg-ms-accent px-7 py-4 text-[15px] font-semibold text-white transition-colors duration-300 [--btn-fill:white] hover:text-ms-primary"
+              className="btn-fill inline-flex items-center justify-center rounded-2xl bg-ms-accent px-7 py-4 text-[15px] font-semibold text-white transition-colors duration-300 [--btn-fill:white] hover:text-ms-primary"
             >
               Découvrir la gamme
-              <span aria-hidden="true" className="transition-transform duration-500 ease-out-expo group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
             </a>
           </div>
         </div>

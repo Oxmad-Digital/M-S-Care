@@ -50,7 +50,7 @@ export function About() {
             href="#engagement"
             className="mt-9 inline-flex items-center gap-2.5 border-b border-ms-accent/35 pb-1 text-[15px] font-semibold text-ms-accent transition hover:text-ms-primary"
           >
-            Notre engagement sur le terrain <span aria-hidden="true" className="text-[17px]">→</span>
+            Notre engagement sur le terrain
           </a>
           </RevealItem>
         </RevealGroup>
