@@ -33,7 +33,7 @@ function Icon({ d }: { d: string }) {
 }
 
 const ICONS = {
-  reply: "M9 17 4 12l5-5M4 12h11a5 5 0 0 1 5 5v2",
+  copy: "M8 8h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2V8Zm-3 8H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1",
   phone: "M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z",
   check: "M20 6 9 17l-5-5",
   undo: "M3 7v6h6M21 17a9 9 0 0 0-15-6.7L3 13",
@@ -51,11 +51,27 @@ export function MessageCard({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [confirming, setConfirming] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [pending, startTransition] = useTransition();
   const long = message.message.length > LONG_MESSAGE;
-  const replySubject = encodeURIComponent(`Re: ${message.subject} — M&S Care`);
 
   const toggleRead = () => startTransition(() => markMessageRead(message.id, !message.read));
+  const copyEmail = async () => {
+    try {
+      await navigator.clipboard.writeText(message.email);
+    } catch {
+      const input = document.createElement("textarea");
+      input.value = message.email;
+      input.style.position = "fixed";
+      input.style.opacity = "0";
+      document.body.appendChild(input);
+      input.select();
+      document.execCommand("copy");
+      input.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 2_000);
+  };
   const remove = () => {
     setConfirming(false);
     startTransition(() => deleteMessage(message.id));
@@ -87,9 +103,14 @@ export function MessageCard({
       </header>
 
       <p className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[13px] text-ms-text-muted">
-        <a href={`mailto:${message.email}`} className="break-all hover:text-ms-primary hover:underline">
+        <button
+          type="button"
+          onClick={copyEmail}
+          title="Copier l’adresse email"
+          className="break-all text-left hover:text-ms-primary hover:underline"
+        >
           {message.email}
-        </a>
+        </button>
         {message.phone && (
           <a href={`tel:${message.phone.replace(/[^\d+]/g, "")}`} className="hover:text-ms-primary hover:underline">
             {message.phone}
@@ -115,10 +136,10 @@ export function MessageCard({
       )}
 
       <footer className="-mx-2 mt-3 flex flex-wrap items-center gap-x-1 border-t border-ms-border pt-2">
-        <a href={`mailto:${message.email}?subject=${replySubject}`} className={`${actionClass} text-ms-accent`}>
-          <Icon d={ICONS.reply} />
-          Répondre
-        </a>
+        <button type="button" onClick={copyEmail} className={`${actionClass} text-ms-accent`}>
+          <Icon d={ICONS.copy} />
+          <span aria-live="polite">{copied ? "Email copié" : "Copier l’email"}</span>
+        </button>
         {message.phone && (
           <a href={`tel:${message.phone.replace(/[^\d+]/g, "")}`} className={actionClass}>
             <Icon d={ICONS.phone} />
