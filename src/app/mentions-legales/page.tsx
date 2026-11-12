@@ -11,16 +11,16 @@ export const metadata: Metadata = {
 };
 
 const EDITOR_INFO = [
-  { label: "Raison sociale", value: "Linea Pharmaceuticals (Int) Ltd" },
+  { label: "Raison sociale", value: "M&S Care" },
   { label: "Nom commercial", value: "M&S Care" },
   {
     label: "Forme juridique",
     value: "Société privée à responsabilité limitée par actions (Limited by Shares)",
   },
-  { label: "Numéro d’immatriculation", value: "C109181" },
-  { label: "Business Registration Number (BRN)", value: "C12109181" },
-  { label: "Tax Account Number (TAN / TVA)", value: "27151349" },
-  { label: "Directeur de la publication", value: "Sajid Aboobakar" },
+  { label: "Numéro d’immatriculation", value: "C109181", hidden: true },
+  { label: "Business Registration Number (BRN)", value: "C12109181", hidden: true },
+  { label: "Tax Account Number (TAN / TVA)", value: "27151349", hidden: true },
+  { label: "Directeur de la publication", value: "Sajid Aboobakar", hidden: true },
   {
     label: "Siège social",
     value:
@@ -59,10 +59,12 @@ export default function MentionsLegalesPage() {
             </h2>
             <dl className="space-y-1 text-[15px] leading-[1.75] text-ms-ink">
               {EDITOR_INFO.map((item) => (
-                <div key={item.label}>
-                  <dt className="inline font-bold">{item.label} :</dt>{" "}
-                  <dd className="inline">{item.value}</dd>
-                </div>
+                item.hidden ? null : (
+                  <div key={item.label}>
+                    <dt className="inline font-bold">{item.label} :</dt>{" "}
+                    <dd className="inline">{item.value}</dd>
+                  </div>
+                )
               ))}
               <div>
                 <dt className="inline font-bold">Contact :</dt>{" "}
@@ -96,14 +98,14 @@ export default function MentionsLegalesPage() {
 
           <Section title="Protection des données personnelles">
             <p>
-              Linea Pharmaceuticals (Int) Ltd traite les données personnelles collectées sur ce site
+              M&amp;S Care traite les données personnelles collectées sur ce site
               conformément à la <strong className="text-ms-ink">Data Protection Act 2017</strong> de la
               République de Maurice.
             </p>
             <List>
               <li>
-                <strong className="text-ms-ink">Responsable du traitement :</strong> Linea
-                Pharmaceuticals (Int) Ltd, à l’adresse indiquée ci-dessus.
+                <strong className="text-ms-ink">Responsable du traitement :</strong> M&amp;S Care, à
+                l’adresse indiquée ci-dessus.
               </li>
               <li>
                 <strong className="text-ms-ink">Formulaire de contact :</strong> lorsque vous nous
@@ -180,8 +182,8 @@ export default function MentionsLegalesPage() {
           <Section title="Propriété intellectuelle">
             <p>
               L’ensemble des contenus présents sur ce site (textes, images originales, photographies,
-              logos, éléments graphiques, etc.) est la propriété de Linea Pharmaceuticals (Int) Ltd ou de
-              ses partenaires et concédants, sauf mention contraire.
+              logos, éléments graphiques, etc.) est la propriété de M&amp;S Care ou de ses partenaires et
+              concédants, sauf mention contraire.
             </p>
             <p className="font-bold text-ms-ink">Exceptions :</p>
             <List>
@@ -203,10 +205,10 @@ export default function MentionsLegalesPage() {
 
           <Section title="Limitation de responsabilité">
             <p>
-              Linea Pharmaceuticals (Int) Ltd s’efforce d’assurer l’exactitude et l’actualisation des
-              informations diffusées sur le site. Elle ne garantit toutefois pas que celles-ci soient
-              exhaustives ou exemptes d’erreur. Les informations présentées, notamment celles relatives à
-              la santé et aux produits, ne remplacent pas l’avis d’un professionnel de santé.
+              M&amp;S Care s’efforce d’assurer l’exactitude et l’actualisation des informations diffusées
+              sur le site. Elle ne garantit toutefois pas que celles-ci soient exhaustives ou exemptes
+              d’erreur. Les informations présentées, notamment celles relatives à la santé et aux produits,
+              ne remplacent pas l’avis d’un professionnel de santé.
             </p>
           </Section>
 
