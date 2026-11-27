@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 // Envoi transactionnel via Plunk (https://docs.useplunk.com).
 // `reply` : adresse utilisée quand le destinataire clique sur « Répondre ».
@@ -13,6 +14,18 @@ export async function sendEmail({ to, subject, body, reply }: { to: string; subj
   });
   if (!response.ok) {
     throw new Error(`Plunk a refusé l’envoi (${response.status}) : ${await response.text()}`);
+  }
+  await countSentEmail();
+}
+
+// Compteur mensuel relevé par l'ERP (coût Plunk à l'e-mail). Un échec du compteur ne doit pas
+// faire échouer un envoi déjà accepté par Plunk.
+async function countSentEmail() {
+  const month = new Date().toISOString().slice(0, 7);
+  try {
+    await prisma.emailMonth.upsert({ where: { month }, create: { month, sent: 1 }, update: { sent: { increment: 1 } } });
+  } catch (error) {
+    console.error("Compteur d’e-mails non mis à jour :", error);
   }
 }
 

@@ -189,3 +189,9 @@ export async function monthVisitors(month: string) {
   `);
   return row.visitors;
 }
+
+// E-mails acceptés par Plunk dans le mois UTC "AAAA-MM" (compteur tenu par sendEmail).
+export async function monthEmails(month: string) {
+  const row = await readDatabase(() => prisma.emailMonth.findUnique({ where: { month } }));
+  return row?.sent ?? 0;
+}

@@ -150,3 +150,10 @@ model StatDimension {
   @@id([day, dimension, value])
   @@index([dimension, day])
 }
+
+// Nombre d'e-mails acceptés par Plunk dans le mois UTC ("AAAA-MM") : relevé par l'ERP Oxmad
+// (route /api/oxmad/usage). Simple compteur, sans destinataire ni contenu.
+model EmailMonth {
+  month String @id
+  sent  Int    @default(0)
+}
