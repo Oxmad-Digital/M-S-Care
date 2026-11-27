@@ -13,6 +13,16 @@ const PLOT_HEIGHT = HEIGHT - MARGIN.top - MARGIN.bottom;
 // Paire validée (séparation daltonisme et contraste sur fond blanc).
 const VIEWS_COLOR = "#0f9a83";
 const VISITORS_COLOR = "#c47a14";
+const TRAFFIC_SERIES = [
+  { key: "views", color: VIEWS_COLOR, label: "Vues", tooltipLabel: "vues" },
+  { key: "visitors", color: VISITORS_COLOR, label: "Visiteurs uniques", tooltipLabel: "visiteurs" },
+] as const;
+
+const CHART_MODES = [
+  { key: "line", label: "Courbes" },
+  { key: "bar", label: "Barres" },
+] as const;
+type ChartMode = (typeof CHART_MODES)[number]["key"];
 
 // Pas entier d'au moins 1 : des comptes n'ont pas de graduations décimales,
 // et chaque graduation reste unique (elle sert de clé).
@@ -38,10 +48,15 @@ export function DailyTrafficChart({
   granularity?: "day" | "week";
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const [mode, setMode] = useState<ChartMode>("line");
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [pointer, setPointer] = useState<{ x: number; y: number; wrapWidth: number } | null>(null);
 
   const n = daily.length;
+  const showBars = mode === "bar";
+  const bucketWidth = PLOT_WIDTH / Math.max(1, n);
+  const barGap = Math.min(4, bucketWidth * 0.1);
+  const barWidth = Math.min(24, (bucketWidth * 0.8 - barGap) / 2);
 
   const { xAt, yAt, viewsPath, visitorsPath, ticks, labelIndices } = useMemo(() => {
     const dataMax = Math.max(1, ...daily.map((d) => Math.max(d.views, d.visitors)));
@@ -49,7 +64,10 @@ export function DailyTrafficChart({
     const tickCount = Math.max(1, Math.ceil(dataMax / step));
     const max = tickCount * step;
 
-    const xAt = (i: number) => (n <= 1 ? MARGIN.left + PLOT_WIDTH / 2 : MARGIN.left + (i / (n - 1)) * PLOT_WIDTH);
+    const xAt = (i: number) => {
+      if (showBars) return MARGIN.left + (i + 0.5) * bucketWidth;
+      return n <= 1 ? MARGIN.left + PLOT_WIDTH / 2 : MARGIN.left + (i / (n - 1)) * PLOT_WIDTH;
+    };
     const yAt = (v: number) => MARGIN.top + PLOT_HEIGHT - (v / max) * PLOT_HEIGHT;
 
     const toPath = (key: "views" | "visitors") =>
@@ -60,7 +78,7 @@ export function DailyTrafficChart({
     const labelIndices = daily.map((_, i) => i).filter((i) => i % labelStep === 0 || i === n - 1);
 
     return { xAt, yAt, viewsPath: toPath("views"), visitorsPath: toPath("visitors"), ticks, labelIndices };
-  }, [daily, n]);
+  }, [daily, n, showBars, bucketWidth]);
 
   if (n === 0) {
     return <p className="text-[13.5px] text-ms-text-muted">Aucune donnée pour le moment.</p>;
@@ -71,7 +89,8 @@ export function DailyTrafficChart({
     if (!rect) return;
     const relX = ((e.clientX - rect.left) / rect.width) * WIDTH;
     const ratio = (relX - MARGIN.left) / PLOT_WIDTH;
-    setHoverIndex(Math.min(n - 1, Math.max(0, Math.round(ratio * (n - 1)))));
+    const index = showBars ? Math.floor(ratio * n) : Math.round(ratio * (n - 1));
+    setHoverIndex(Math.min(n - 1, Math.max(0, index)));
     setPointer({ x: e.clientX - rect.left, y: e.clientY - rect.top, wrapWidth: rect.width });
   };
 
@@ -86,9 +105,28 @@ export function DailyTrafficChart({
   const lastVisitorsY = yAt(last.visitors);
   const endLabelsCollide = Math.abs(lastViewsY - lastVisitorsY) < 16;
   const flipTooltip = pointer ? pointer.x / pointer.wrapWidth > 0.65 : false;
+  const baseline = yAt(0);
 
   return (
     <div>
+      <div role="group" aria-label="Type de graphique" className="mb-3 flex w-fit rounded-lg border border-ms-border p-1">
+        {CHART_MODES.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            aria-pressed={mode === option.key}
+            onClick={() => {
+              if (mode === option.key) return;
+              setMode(option.key);
+              handlePointerLeave();
+            }}
+            className="rounded-md px-3 py-1.5 text-[13px] font-semibold text-ms-text transition hover:text-ms-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ms-primary aria-pressed:bg-ms-accent aria-pressed:text-white"
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+
       <div
         ref={wrapRef}
         className="relative touch-pan-y"
@@ -130,7 +168,7 @@ export function DailyTrafficChart({
             </text>
           ))}
 
-          {hoverIndex !== null && (
+          {hovered && hoverIndex !== null && (
             <line
               x1={xAt(hoverIndex)}
               x2={xAt(hoverIndex)}
@@ -141,27 +179,46 @@ export function DailyTrafficChart({
             />
           )}
 
-          <path d={visitorsPath} fill="none" stroke={VISITORS_COLOR} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-          <path d={viewsPath} fill="none" stroke={VIEWS_COLOR} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-
-          <circle cx={xAt(n - 1)} cy={lastVisitorsY} r={4} fill={VISITORS_COLOR} stroke="#fff" strokeWidth={2} />
-          <circle cx={xAt(n - 1)} cy={lastViewsY} r={4} fill={VIEWS_COLOR} stroke="#fff" strokeWidth={2} />
-
-          {!endLabelsCollide && (
+          {showBars ? (
+            daily.map((day, i) => (
+              <g key={day.day} transform={`translate(${xAt(i) - barWidth - barGap / 2} 0)`}>
+                {TRAFFIC_SERIES.map(({ key, color }, seriesIndex) => (
+                  <rect
+                    key={key}
+                    x={seriesIndex * (barWidth + barGap)}
+                    y={yAt(day[key])}
+                    width={barWidth}
+                    height={baseline - yAt(day[key])}
+                    fill={color}
+                  />
+                ))}
+              </g>
+            ))
+          ) : (
             <>
-              <text x={xAt(n - 1) + 8} y={lastViewsY} dominantBaseline="middle" className="fill-ms-ink text-[11px] font-semibold tabular-nums">
-                {last.views.toLocaleString("fr-FR")}
-              </text>
-              <text x={xAt(n - 1) + 8} y={lastVisitorsY} dominantBaseline="middle" className="fill-ms-ink text-[11px] font-semibold tabular-nums">
-                {last.visitors.toLocaleString("fr-FR")}
-              </text>
-            </>
-          )}
+              <path d={visitorsPath} fill="none" stroke={VISITORS_COLOR} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
+              <path d={viewsPath} fill="none" stroke={VIEWS_COLOR} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
 
-          {hovered && hoverIndex !== null && (
-            <>
-              <circle cx={xAt(hoverIndex)} cy={yAt(hovered.views)} r={4} fill={VIEWS_COLOR} stroke="#fff" strokeWidth={2} />
-              <circle cx={xAt(hoverIndex)} cy={yAt(hovered.visitors)} r={4} fill={VISITORS_COLOR} stroke="#fff" strokeWidth={2} />
+              <circle cx={xAt(n - 1)} cy={lastVisitorsY} r={4} fill={VISITORS_COLOR} stroke="#fff" strokeWidth={2} />
+              <circle cx={xAt(n - 1)} cy={lastViewsY} r={4} fill={VIEWS_COLOR} stroke="#fff" strokeWidth={2} />
+
+              {!endLabelsCollide && (
+                <>
+                  <text x={xAt(n - 1) + 8} y={lastViewsY} dominantBaseline="middle" className="fill-ms-ink text-[11px] font-semibold tabular-nums">
+                    {last.views.toLocaleString("fr-FR")}
+                  </text>
+                  <text x={xAt(n - 1) + 8} y={lastVisitorsY} dominantBaseline="middle" className="fill-ms-ink text-[11px] font-semibold tabular-nums">
+                    {last.visitors.toLocaleString("fr-FR")}
+                  </text>
+                </>
+              )}
+
+              {hovered && hoverIndex !== null && (
+                <>
+                  <circle cx={xAt(hoverIndex)} cy={yAt(hovered.views)} r={4} fill={VIEWS_COLOR} stroke="#fff" strokeWidth={2} />
+                  <circle cx={xAt(hoverIndex)} cy={yAt(hovered.visitors)} r={4} fill={VISITORS_COLOR} stroke="#fff" strokeWidth={2} />
+                </>
+              )}
             </>
           )}
         </svg>
@@ -180,14 +237,11 @@ export function DailyTrafficChart({
                 ? `Semaine du ${formatDate(hovered.day, { day: "2-digit", month: "long", year: "numeric" })}`
                 : formatDate(hovered.day, { weekday: "short", day: "2-digit", month: "long" })}
             </div>
-            {[
-              { color: VIEWS_COLOR, value: hovered.views, label: "vues" },
-              { color: VISITORS_COLOR, value: hovered.visitors, label: "visiteurs" },
-            ].map((row) => (
-              <div key={row.label} className="flex items-center gap-2 text-[13px]">
-                <span className="size-2.5 rounded-sm" style={{ background: row.color }} />
-                <span className="font-bold tabular-nums">{row.value.toLocaleString("fr-FR")}</span>
-                <span className="text-white/70">{row.label}</span>
+            {TRAFFIC_SERIES.map(({ key, color, tooltipLabel }) => (
+              <div key={key} className="flex items-center gap-2 text-[13px]">
+                <span className="size-2.5 rounded-sm" style={{ background: color }} />
+                <span className="font-bold tabular-nums">{hovered[key].toLocaleString("fr-FR")}</span>
+                <span className="text-white/70">{tooltipLabel}</span>
               </div>
             ))}
           </div>
@@ -195,14 +249,12 @@ export function DailyTrafficChart({
       </div>
 
       <div className="mt-3 flex flex-wrap gap-5 text-[12.5px] text-ms-text">
-        <span className="flex items-center gap-2">
-          <span className="h-0.5 w-4 rounded" style={{ background: VIEWS_COLOR }} />
-          Vues
-        </span>
-        <span className="flex items-center gap-2">
-          <span className="h-0.5 w-4 rounded" style={{ background: VISITORS_COLOR }} />
-          Visiteurs uniques
-        </span>
+        {TRAFFIC_SERIES.map(({ key, color, label }) => (
+          <span key={key} className="flex items-center gap-2">
+            <span className={showBars ? "size-2.5 rounded-sm" : "h-0.5 w-4 rounded"} style={{ background: color }} />
+            {label}
+          </span>
+        ))}
       </div>
 
       <table className="sr-only">
