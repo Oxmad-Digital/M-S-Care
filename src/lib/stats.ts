@@ -173,3 +173,13 @@ export async function getStats(rangeDays: StatsRange) {
 }
 
 export type Stats = Awaited<ReturnType<typeof getStats>>;
+
+// Visiteurs uniques par jour (UTC), additionnés sur le mois "AAAA-MM" : relevé de l'ERP Oxmad
+// (route /api/oxmad/usage). Mois en cours : total à date.
+export async function monthVisitors(month: string) {
+  const from = `${month}-01`;
+  const to = `${month}-31`; // borne haute textuelle : couvre tous les jours du mois
+  const lastRolled = await prisma.statDay.aggregate({ _max: { day: true } });
+  const { visitors } = await totals({ from, to, after: lastRolled._max.day ?? "" });
+  return visitors;
+}
