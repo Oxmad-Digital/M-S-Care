@@ -1,12 +1,13 @@
-// Lance à la main la tâche de nuit des statistiques : consolidation des journées closes
+// Lance à la main la tâche de nuit des statistiques : import et consolidation des journées closes
 // (rattrape tout l'historique au premier passage), puis archivage R2 des vues de plus de 90 jours.
 // Usage : npx tsx scripts/stats-maintenance.ts [--sans-archive]
 import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
-import { archiveOldDays, rollupClosedDays } from "../src/lib/stats-rollup";
+import { archiveOldDays, importAndRollupClosedDays } from "../src/lib/stats-rollup";
 
 async function main() {
-  const rolledUp = await rollupClosedDays();
+  const { imported, rolledUp } = await importAndRollupClosedDays();
+  console.log(`Vues importées : ${imported}`);
   console.log(`Journées consolidées : ${rolledUp.length}${rolledUp.length ? ` (${rolledUp[0]} → ${rolledUp.at(-1)})` : ""}`);
 
   if (process.argv.includes("--sans-archive")) return;

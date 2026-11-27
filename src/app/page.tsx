@@ -10,6 +10,7 @@ import { Catalogue } from "@/components/site/Catalogue";
 import { ContactSection } from "@/components/site/ContactSection";
 import { Footer } from "@/components/site/Footer";
 import { MaintenanceGate } from "@/components/site/MaintenanceGate";
+import { Tracker } from "@/components/site/Tracker";
 import { PAGE_TRANSITION } from "@/components/motion/page-transition";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,7 @@ export default async function Home() {
 
   return (
     <MaintenanceGate>
+      <Tracker path="/" />
       <Header overlay />
       <ViewTransition {...PAGE_TRANSITION}>
         <main>

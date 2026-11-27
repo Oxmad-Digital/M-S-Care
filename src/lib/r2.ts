@@ -34,8 +34,8 @@ export function getR2Bucket(kind: R2BucketKind): R2Bucket {
   return bucket;
 }
 
-// Bucket privé des archives de statistiques : jamais d'URL publique, accès uniquement
-// avec les clés du serveur.
+// Bucket privé des vues en attente et des archives de statistiques, accessible
+// uniquement avec les clés du serveur.
 let archiveBucket: { client: S3Client; bucket: string } | undefined;
 
 export function getR2ArchiveBucket() {

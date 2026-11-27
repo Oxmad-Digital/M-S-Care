@@ -92,24 +92,26 @@ Toutes les routes `/admin/*` (hors `/admin/login`) sont protégées par un middl
 `/admin/stats` suit la fréquentation du site public (accueil et fiches produits) avec un script maison, sans service tiers ni cookie : vues, visiteurs uniques, durée moyenne par page, pages les plus vues, provenance, appareils et pays (en-tête `x-vercel-ip-country`, disponible une fois déployé sur Vercel). Périodes de 7, 30, 90 jours ou 1 an (graphique par semaine), avec l'évolution par rapport à la période précédente.
 
 - `src/components/site/Tracker.tsx` envoie chaque page vue à `/api/track`, puis le temps passé à `/api/track/duration` quand on la quitte.
+- Les deux routes utilisent le bucket R2 privé existant (`pending-page-views/v1/`). Chaque vue occupe un objet temporaire, mis à jour quand sa durée arrive. La collecte ne comporte aucune requête à Neon.
 - Le visiteur est identifié par un hash (IP + navigateur + jour, salé par une clé dérivée d'`AUTH_SECRET`) : l'IP n'est jamais stockée et l'identifiant change chaque jour.
 - Les robots, les pages admin, l'équipe connectée et les visites pendant la maintenance ne sont pas comptés.
 - Les navigateurs avec « Global Privacy Control » ou « Do Not Track » activé ne sont pas mesurés (opposition, décrite dans les mentions légales).
 
 #### Conservation et archivage (`src/lib/stats-rollup.ts`)
 
-Une tâche Vercel Cron (`vercel.json`, chaque nuit à 3 h UTC) appelle `/api/cron/stats` :
+Une tâche Vercel Cron (`vercel.json`, chaque jour à 3 h UTC, soit 6 h à Madagascar) appelle `/api/cron/stats` :
 
-1. **Consolidation** : chaque journée close est résumée dans `StatDay` (vues, visiteurs, durées) et `StatDimension` (vues par page, provenance, appareil, pays), puis `visitorHash` est effacé des `PageView` de ce jour. Après J+1, il n'y a plus de donnée personnelle en base. Ces compteurs anonymes sont conservés sans limite et alimentent la page stats.
-2. **Archivage** : les `PageView` de plus de 90 jours sont envoyées dans un bucket R2 **privé** (`page-views/AAAA/MM/AAAA-MM-JJ.ndjson.gz`), sans id, sans heure exacte ni identifiant visiteur, lignes triées par contenu, puis supprimées de la base une fois l'envoi vérifié.
+1. **Import.** Les vues des journées UTC closes sont insérées dans `PageView` par lots de 250 au maximum. Chaque lot est supprimé de R2 après confirmation de l’écriture SQL. Les identifiants de vue permettent de reprendre un import interrompu sans doublons.
+2. **Consolidation.** Chaque journée close est résumée dans `StatDay` (vues, visiteurs, durées) et `StatDimension` (vues par page, provenance, appareil, pays), puis `visitorHash` est effacé des `PageView` de ce jour. Ces compteurs anonymes sont conservés sans limite.
+3. **Archivage.** Les `PageView` de plus de 90 jours sont envoyées dans R2 (`page-views/AAAA/MM/AAAA-MM-JJ.ndjson.gz`), sans id, sans heure exacte ni identifiant visiteur, lignes triées par contenu, puis supprimées de la base une fois l'envoi vérifié.
 
-La page stats lit les compteurs pour les jours consolidés et `PageView` pour les jours suivants (aujourd'hui, et hier avant le passage de la tâche).
+La page stats affiche les journées consolidées et indique la date de la dernière journée incluse.
 
 Mise en place :
 
-- Créer un bucket R2 privé (sans accès public ni domaine `r2.dev`) et un jeton API limité à ce bucket.
+- Configurer un bucket R2 privé (sans accès public ni domaine `r2.dev`) et un jeton R2 avec accès en lecture et écriture à ce bucket, y compris la liste et la suppression des objets.
 - Variables d'environnement : `CRON_SECRET` (chaîne aléatoire, ex. `openssl rand -hex 32` ; Vercel l'envoie au cron), `R2_ARCHIVE_BUCKET`, `R2_ARCHIVE_ACCESS_KEY_ID`, `R2_ARCHIVE_SECRET_ACCESS_KEY` (`R2_ENDPOINT` est partagé avec les autres buckets).
-- Appliquer la migration `20261107120000_stat_rollups`, puis consolider l'historique existant : `npx tsx scripts/stats-maintenance.ts` (`--sans-archive` pour ne pas archiver).
+- Appliquer la migration `20261107120000_stat_rollups` si elle est en attente. Pour lancer manuellement l’import et la consolidation, utiliser `npx tsx scripts/stats-maintenance.ts` (`--sans-archive` pour ne pas archiver).
 
 ## Déploiement (Vercel)
 

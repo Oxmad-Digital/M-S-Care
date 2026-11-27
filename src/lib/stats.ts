@@ -11,10 +11,8 @@ export function parseRange(value: unknown): StatsRange {
   return (STATS_RANGES as readonly number[]).includes(n) ? (n as StatsRange) : 30;
 }
 
-const daysAgo = (n: number) => utcDay(-n);
-
-// Les journées consolidées se lisent dans StatDay / StatDimension ; les suivantes
-// (aujourd'hui, et hier tant que la tâche de nuit n'est pas passée) dans PageView.
+// Les journées consolidées se lisent dans StatDay / StatDimension. PageView reste
+// disponible pour les données historiques en attente de leur première consolidation.
 // `after` vaut le dernier jour consolidé : "" (avant toute date) si aucun.
 type Window = { from: string; to: string; after: string };
 
@@ -27,9 +25,9 @@ async function totals({ from, to, after }: Window): Promise<Totals> {
       _sum: { views: true, visitors: true, durationSum: true, durationCount: true },
     }),
     // Le hash change chaque jour : visiteurs distincts par jour, comme dans StatDay.
-    prisma.$queryRaw<Totals[]>`
+    to <= after ? [] : prisma.$queryRaw<Totals[]>`
       SELECT COUNT(*)::int AS views,
-             COUNT(DISTINCT ("day", "visitorHash"))::int AS visitors,
+             COUNT(DISTINCT ("day", "visitorHash")) FILTER (WHERE "visitorHash" <> '')::int AS visitors,
              COALESCE(SUM("duration") FILTER (WHERE "duration" > 0), 0)::float8 AS "durationSum",
              COUNT(*) FILTER (WHERE "duration" > 0)::int AS "durationCount"
       FROM "PageView" WHERE "day" >= ${from} AND "day" <= ${to} AND "day" > ${after}
@@ -49,8 +47,8 @@ async function daily({ from, to, after }: Window) {
       where: { day: { gte: from, lte: to } },
       select: { day: true, views: true, visitors: true },
     }),
-    prisma.$queryRaw<{ day: string; views: number; visitors: number }[]>`
-      SELECT "day", COUNT(*)::int AS views, COUNT(DISTINCT "visitorHash")::int AS visitors
+    to <= after ? [] : prisma.$queryRaw<{ day: string; views: number; visitors: number }[]>`
+      SELECT "day", COUNT(*)::int AS views, COUNT(DISTINCT NULLIF("visitorHash", ''))::int AS visitors
       FROM "PageView" WHERE "day" >= ${from} AND "day" <= ${to} AND "day" > ${after}
       GROUP BY "day"
     `,
@@ -74,7 +72,7 @@ async function dimension(dim: Dimension, { from, to, after }: Window) {
       where: { dimension: dim, day: { gte: from, lte: to } },
       _sum: { views: true },
     }),
-    prisma.$queryRaw<{ value: string; views: number }[]>`
+    to <= after ? [] : prisma.$queryRaw<{ value: string; views: number }[]>`
       SELECT ${column} AS value, COUNT(*)::int AS views
       FROM "PageView" WHERE "day" >= ${from} AND "day" <= ${to} AND "day" > ${after}
       GROUP BY ${column}
@@ -110,12 +108,12 @@ export function groupByWeek(points: TrafficPoint[]): TrafficPoint[] {
 }
 
 export async function getStats(rangeDays: StatsRange) {
-  const today = daysAgo(0);
-  const startDay = daysAgo(rangeDays - 1);
-
   const lastRolled = await readDatabase(() => prisma.statDay.aggregate({ _max: { day: true } }));
   const after = lastRolled._max.day ?? "";
-  const current: Window = { from: startDay, to: today, after };
+  const endDay = after || utcDay(-1);
+  const end = new Date(`${endDay}T00:00:00Z`);
+  const daysAgo = (n: number) => utcDay(-n, end);
+  const current: Window = { from: daysAgo(rangeDays - 1), to: endDay, after };
   // Période précédente de même durée, pour l'évolution.
   const previousWindow: Window = { from: daysAgo(rangeDays * 2 - 1), to: daysAgo(rangeDays), after };
 
@@ -150,6 +148,7 @@ export async function getStats(rangeDays: StatsRange) {
   const granularity: "day" | "week" = rangeDays > 90 ? "week" : "day";
 
   return {
+    dataThrough: lastRolled._max.day,
     totalViews: now.views,
     totalVisitors: now.visitors,
     previousViews: previous.views,
@@ -175,11 +174,18 @@ export async function getStats(rangeDays: StatsRange) {
 export type Stats = Awaited<ReturnType<typeof getStats>>;
 
 // Visiteurs uniques par jour (UTC), additionnés sur le mois "AAAA-MM" : relevé de l'ERP Oxmad
-// (route /api/oxmad/usage). Mois en cours : total à date.
+// (route /api/oxmad/usage). Mois en cours : total jusqu'au dernier import.
 export async function monthVisitors(month: string) {
   const from = `${month}-01`;
   const to = `${month}-31`; // borne haute textuelle : couvre tous les jours du mois
-  const lastRolled = await prisma.statDay.aggregate({ _max: { day: true } });
-  const { visitors } = await totals({ from, to, after: lastRolled._max.day ?? "" });
-  return visitors;
+  const [row] = await readDatabase(() => prisma.$queryRaw<{ visitors: number }[]>`
+    SELECT (
+      COALESCE((SELECT SUM("visitors") FROM "StatDay" WHERE "day" BETWEEN ${from} AND ${to}), 0) +
+      (SELECT COUNT(DISTINCT (pv."day", pv."visitorHash"))
+       FROM "PageView" pv
+       WHERE pv."day" BETWEEN ${from} AND ${to} AND pv."visitorHash" <> ''
+         AND NOT EXISTS (SELECT 1 FROM "StatDay" sd WHERE sd."day" = pv."day"))
+    )::int AS visitors
+  `);
+  return row.visitors;
 }

@@ -1,7 +1,7 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { archiveOldDays, rollupClosedDays } from "@/lib/stats-rollup";
+import { archiveOldDays, importAndRollupClosedDays } from "@/lib/stats-rollup";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -16,28 +16,29 @@ function isAuthorized(request: NextRequest) {
   return expected.length === given.length && crypto.timingSafeEqual(expected, given);
 }
 
-// Tâche de nuit : consolide les journées closes (et efface les identifiants visiteurs),
+// Tâche de nuit : importe et consolide les journées closes (et efface les identifiants visiteurs),
 // puis archive dans R2 les vues détaillées de plus de 90 jours.
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   }
 
-  const rolledUp = await rollupClosedDays();
+  const now = new Date();
+  const { imported, rolledUp } = await importAndRollupClosedDays(now);
 
   // Un problème d'archivage (R2 indisponible) n'empêche pas la consolidation, déjà faite :
   // les vues restent en base et seront archivées à la prochaine exécution.
   let archived: string[] = [];
   let archiveError: string | undefined;
   try {
-    archived = await archiveOldDays();
+    archived = await archiveOldDays(now);
   } catch (error) {
     archiveError = error instanceof Error ? error.message : "Échec de l'archivage";
     console.error("[cron/stats] archivage", error);
   }
 
   return NextResponse.json(
-    { ok: !archiveError, rolledUp, archived, archiveError },
+    { ok: !archiveError, imported, rolledUp, archived, archiveError },
     { status: archiveError ? 500 : 200 },
   );
 }

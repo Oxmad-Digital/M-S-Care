@@ -5,7 +5,7 @@ import { readDatabase } from "@/lib/database-read";
 
 export const SETTINGS_TAG = "settings";
 
-// Lu sur chaque page publique et chaque vue enregistrée : mis en cache, invalidé par
+// Lu sur les pages publiques : mis en cache, invalidé par
 // updateMaintenance, et relu au plus tard après une heure.
 const getCachedSettings = unstable_cache(
   async () => {

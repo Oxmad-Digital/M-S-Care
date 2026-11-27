@@ -162,8 +162,8 @@ export default function MentionsLegalesPage() {
               <li>
                 <strong className="text-ms-ink">Identifiant de visite :</strong> pour compter les
                 visiteurs uniques, un identifiant pseudonyme est calculé à partir de l’adresse IP et du
-                navigateur, de façon irréversible, et change chaque jour. Il est effacé dès la nuit
-                suivante.
+                navigateur, de façon irréversible, et change chaque jour. Il est effacé lors du
+                traitement quotidien des journées écoulées.
               </li>
               <li>
                 <strong className="text-ms-ink">Durée de conservation :</strong> les vues détaillées,

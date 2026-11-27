@@ -3,6 +3,7 @@ import { cache, ViewTransition } from "react";
 import { notFound } from "next/navigation";
 import { getPublishedProduct } from "@/lib/catalogue";
 import { ProductDetail } from "@/components/site/ProductDetail";
+import { Tracker } from "@/components/site/Tracker";
 import { PAGE_TRANSITION } from "@/components/motion/page-transition";
 
 export const dynamic = "force-dynamic";
@@ -35,10 +36,13 @@ export default async function ProductPage({ params, searchParams }: Props) {
   const initialDosage = typeof dosage === "string" ? dosage : undefined;
 
   return (
-    <ViewTransition {...PAGE_TRANSITION}>
-      <div>
-        <ProductDetail key={`${product.id}-${initialDosage ?? ""}`} product={product} initialDosage={initialDosage} />
-      </div>
-    </ViewTransition>
+    <>
+      <Tracker path={`/produits/${slug}`} />
+      <ViewTransition {...PAGE_TRANSITION}>
+        <div>
+          <ProductDetail key={`${product.id}-${initialDosage ?? ""}`} product={product} initialDosage={initialDosage} />
+        </div>
+      </ViewTransition>
+    </>
   );
 }

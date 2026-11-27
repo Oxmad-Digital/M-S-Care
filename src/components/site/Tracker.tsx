@@ -1,20 +1,16 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 
 function sendDuration(id: string, token: string, duration: number) {
   const payload = JSON.stringify({ id, token, duration });
-  if (navigator.sendBeacon) {
-    navigator.sendBeacon("/api/track/duration", new Blob([payload], { type: "application/json" }));
-  } else {
-    fetch("/api/track/duration", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: payload,
-      keepalive: true,
-    }).catch(() => {});
-  }
+  if (navigator.sendBeacon?.("/api/track/duration", new Blob([payload], { type: "application/json" }))) return;
+  fetch("/api/track/duration", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: payload,
+    keepalive: true,
+  }).catch(() => {});
 }
 
 // Le visiteur qui a activé « Global Privacy Control » ou « Do Not Track » dans son
@@ -25,20 +21,24 @@ function hasOptedOut() {
 }
 
 // Enregistre chaque page publique vue, puis le temps passé dessus quand on la quitte.
-export function Tracker() {
-  const pathname = usePathname();
-
+export function Tracker({ path }: { path: string }) {
   useEffect(() => {
-    if (!pathname || pathname.startsWith("/admin") || hasOptedOut()) return;
+    if (hasOptedOut()) return;
 
     const startedAt = Date.now();
     let view: { id: string; token: string } | null = null;
+    let duration: number | null = null;
     let sent = false;
 
-    const finalize = () => {
-      if (sent || !view) return;
+    const send = () => {
+      if (sent || !view || duration === null) return;
       sent = true;
-      sendDuration(view.id, view.token, Date.now() - startedAt);
+      sendDuration(view.id, view.token, duration);
+    };
+
+    const finalize = () => {
+      duration ??= Date.now() - startedAt;
+      send();
     };
 
     const handleVisibility = () => {
@@ -48,13 +48,14 @@ export function Tracker() {
     fetch("/api/track", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ path: pathname, referrer: document.referrer }),
+      body: JSON.stringify({ path, referrer: document.referrer }),
       keepalive: true,
     })
       .then((res) => res.json())
       .then((data: { id?: unknown; token?: unknown }) => {
         if (typeof data.id === "string" && typeof data.token === "string") {
           view = { id: data.id, token: data.token };
+          send();
         }
       })
       .catch(() => {});
@@ -67,7 +68,7 @@ export function Tracker() {
       window.removeEventListener("pagehide", finalize);
       finalize();
     };
-  }, [pathname]);
+  }, [path]);
 
   return null;
 }

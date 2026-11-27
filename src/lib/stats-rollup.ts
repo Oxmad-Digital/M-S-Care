@@ -2,11 +2,12 @@ import { gzipSync } from "node:zlib";
 import { HeadObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
 import { prisma } from "@/lib/prisma";
 import { getR2ArchiveBucket } from "@/lib/r2";
+import { collectionCutoff, drainPageViews } from "@/lib/pending-page-views";
 
 // Cycle de vie des vues de page (minimisation RGPD) :
-// 1. Jour J : la vue est enregistrée avec un identifiant visiteur pseudonyme (visitorHash).
-// 2. Nuit suivante : la journée est consolidée en compteurs anonymes (StatDay, StatDimension),
-//    puis visitorHash est effacé. Plus aucune donnée personnelle ne reste en base.
+// 1. Jour J : R2 reçoit la vue et son identifiant pseudonyme (visitorHash).
+// 2. Nuit suivante : les vues sont importées en base et consolidées en compteurs
+//    anonymes (StatDay, StatDimension), puis visitorHash est effacé.
 // 3. Après RAW_RETENTION_DAYS : les vues détaillées, déjà anonymes, partent dans une archive
 //    R2 privée et sont supprimées de la base.
 export const RAW_RETENTION_DAYS = 90;
@@ -100,22 +101,27 @@ const RAW_SELECT = {
 // Chaque journée est traitée dans une transaction : compteurs créés et visitorHash effacé
 // ensemble, ou pas du tout. S'arrête à la première erreur pour ne jamais laisser de trou,
 // ce qui garantit que tous les jours jusqu'au dernier StatDay sont consolidés.
-export async function rollupClosedDays(now = new Date()) {
-  const today = utcDay(0, now);
+async function rollupClosedDays(before: Date) {
+  const today = utcDay(0, before);
+  const yesterday = utcDay(-1, before);
   const pending = await prisma.$queryRaw<{ day: string }[]>`
-    SELECT DISTINCT pv."day" FROM "PageView" pv
-    WHERE pv."day" < ${today}
-      AND NOT EXISTS (SELECT 1 FROM "StatDay" sd WHERE sd."day" = pv."day")
-    ORDER BY pv."day"
+    SELECT days."day"
+    FROM (
+      SELECT pv."day" FROM "PageView" pv WHERE pv."day" < ${today}
+      UNION SELECT ${yesterday}::text
+    ) days
+    WHERE NOT EXISTS (SELECT 1 FROM "StatDay" sd WHERE sd."day" = days."day")
+    ORDER BY days."day"
   `;
 
   const done: string[] = [];
   for (const { day } of pending) {
-    await prisma.$transaction(
+    const consolidated = await prisma.$transaction(
       async (tx) => {
         const rows = await tx.pageView.findMany({ where: { day }, select: RAW_SELECT });
         const rollup = buildRollup(rows);
-        await tx.statDay.create({
+        // Une journée vide marque aussi la date jusqu'à laquelle les chiffres sont disponibles.
+        const claim = await tx.statDay.createMany({
           data: {
             day,
             views: rollup.views,
@@ -123,17 +129,38 @@ export async function rollupClosedDays(now = new Date()) {
             durationSum: rollup.durationSum,
             durationCount: rollup.durationCount,
           },
+          skipDuplicates: true,
         });
+        if (!claim.count) return false;
+        if (!rows.length) return true;
+
         await tx.statDimension.createMany({
           data: rollup.dimensions.map((d) => ({ day, ...d })),
         });
         await tx.pageView.updateMany({ where: { day }, data: { visitorHash: "" } });
+        return true;
       },
       { timeout: 30_000 },
     );
-    done.push(day);
+    if (consolidated) done.push(day);
   }
   return done;
+}
+
+export async function importAndRollupClosedDays(now = new Date()) {
+  const cutoff = collectionCutoff(now);
+  const imported = await drainPageViews(utcDay(0, cutoff), (views) => prisma.$executeRaw`
+    INSERT INTO "PageView" ("id", "day", "path", "referrer", "deviceType", "country", "visitorHash", "createdAt", "duration")
+    SELECT v."id", v."day", v."path", v."referrer", v."deviceType", v."country", v."visitorHash", v."createdAt", v."duration"
+    FROM jsonb_to_recordset(${JSON.stringify(views)}::jsonb) AS v(
+      "id" text, "day" text, "path" text, "referrer" text, "deviceType" text, "country" text,
+      "visitorHash" text, "createdAt" timestamp(3), "duration" integer
+    )
+    WHERE NOT EXISTS (SELECT 1 FROM "StatDay" sd WHERE sd."day" = v."day")
+    ON CONFLICT ("id") DO NOTHING
+  `);
+  const rolledUp = await rollupClosedDays(cutoff);
+  return { imported, rolledUp };
 }
 
 // Déplace dans R2 les vues détaillées de plus de RAW_RETENTION_DAYS jours (déjà consolidées),
@@ -158,6 +185,7 @@ export async function archiveOldDays(now = new Date()) {
       where: { day },
       select: { path: true, referrer: true, deviceType: true, country: true, duration: true },
     });
+    if (!rows.length) continue;
     const body = gzipSync(
       anonymizeForArchive(day, rows).map((r) => JSON.stringify(r)).join("\n") + "\n",
     );

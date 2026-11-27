@@ -57,6 +57,10 @@ function Kpi({ label, value, children }: { label: string; value: string; childre
 
 export function StatsView({ stats, rangeDays }: { stats: Stats; rangeDays: StatsRange }) {
   const avgPerDay = Math.round(stats.totalViews / rangeDays);
+  const dataThrough = stats.dataThrough && new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "long",
+    timeZone: "UTC",
+  }).format(new Date(stats.dataThrough));
 
   return (
     <div className="flex flex-col gap-5">
@@ -64,7 +68,8 @@ export function StatsView({ stats, rangeDays }: { stats: Stats; rangeDays: Stats
         <div>
           <h1 className="text-2xl font-extrabold text-ms-primary">Statistiques</h1>
           <p className="mt-1 text-[13px] text-ms-text-muted">
-            Fréquentation du site public, sans cookie. Les visites de l’équipe connectée ne sont pas comptées.
+            Mise à jour quotidienne à partir de 6 h, heure de Madagascar.
+            {dataThrough && ` Données jusqu’au ${dataThrough} inclus (journées UTC).`}
           </p>
         </div>
         <nav className="flex rounded-lg border border-ms-border bg-white p-1" aria-label="Période">
