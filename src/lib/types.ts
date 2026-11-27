@@ -1,4 +1,4 @@
-import type { ProductCategory } from "@prisma/client";
+import type { ProductCategory } from "@/generated/prisma/enums";
 
 export type CatalogueProduct = {
   id: string;

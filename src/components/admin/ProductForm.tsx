@@ -1,5 +1,5 @@
-import type { Notice, Product, ProductVariant } from "@prisma/client";
-import { ProductCategory } from "@prisma/client";
+import type { Notice, Product, ProductVariant } from "@/generated/prisma/browser";
+import { ProductCategory } from "@/generated/prisma/enums";
 import { NoticesField } from "./NoticesField";
 import { DosagesField } from "./DosagesField";
 import { matchDosageNotices, normalizeDosage } from "@/lib/product-variants";

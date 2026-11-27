@@ -1,4 +1,6 @@
-import { PrismaClient, ProductCategory } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { ProductCategory } from "../src/generated/prisma/enums";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { neonConfig } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";

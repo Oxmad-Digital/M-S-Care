@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState, useTransition } from "react";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/generated/prisma/enums";
 import { inviteMember, removeUser, resendInvitation, revokeInvitation, updateUserRole } from "@/lib/actions/team";
 import { ROLE_DESCRIPTION, ROLE_LABEL, ROLES } from "@/lib/permissions";
 import type { ActionState } from "@/lib/action-state";

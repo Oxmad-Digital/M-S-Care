@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import source from "../data/mandscare-variants.json";
+import source from "../data/mandscare-variants.json" with { type: "json" };
 import { prisma } from "../src/lib/prisma";
 import { normalizeDosage } from "../src/lib/product-variants";
 import { getR2Bucket, publicUrlFor } from "../src/lib/r2";

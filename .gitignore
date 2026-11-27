@@ -4,6 +4,7 @@
 /node_modules
 /.pnp
 .pnp.*
+/src/generated/prisma/
 .yarn/*
 !.yarn/patches
 !.yarn/plugins

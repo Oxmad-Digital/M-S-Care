@@ -9,7 +9,7 @@ import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { ProductCategory } from "@prisma/client";
+import { ProductCategory } from "../src/generated/prisma/enums";
 import { prisma } from "../src/lib/prisma";
 import { getR2Bucket, publicUrlFor, slugifyFileName } from "../src/lib/r2";
 

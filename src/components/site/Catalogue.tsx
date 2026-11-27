@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import type { ProductCategory } from "@prisma/client";
+import type { ProductCategory } from "@/generated/prisma/enums";
 import { AnimatePresence, m, useInView, type Variants } from "motion/react";
 import { RevealText } from "@/components/motion/Reveal";
 import { EASE_OUT_EXPO, VIEWPORT } from "@/components/motion/tokens";

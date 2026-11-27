@@ -2,7 +2,7 @@
 
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
-import { ProductCategory } from "@prisma/client";
+import { ProductCategory } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { PRODUCTS_TAG } from "@/lib/catalogue";
 import { normalizeDosage } from "@/lib/product-variants";

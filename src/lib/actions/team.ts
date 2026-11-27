@@ -2,7 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
-import type { Role } from "@prisma/client";
+import type { Role } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 import { displayName, requireUser, type CurrentUser } from "@/lib/current-user";
 import { appUrl, sendEmail } from "@/lib/email";

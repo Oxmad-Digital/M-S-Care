@@ -9,7 +9,7 @@ import "dotenv/config";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { ProductCategory } from "@prisma/client";
+import { ProductCategory } from "../src/generated/prisma/enums";
 import sharp from "sharp";
 import { prisma } from "../src/lib/prisma";
 import { getR2Bucket, publicUrlFor } from "../src/lib/r2";

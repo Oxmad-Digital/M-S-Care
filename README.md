@@ -6,7 +6,7 @@ Site vitrine et catalogue produits pour le laboratoire pharmaceutique **M&S Care
 
 - Next.js 16 (App Router, TypeScript, Turbopack)
 - Tailwind CSS v4
-- Prisma ORM + Neon (Postgres)
+- Prisma ORM 7 + Neon (Postgres)
 - NextAuth v5 (Credentials, JWT)
 
 ## 1. Créer la base Neon
@@ -29,6 +29,8 @@ cp .env.example .env
 - `AUTH_TRUST_HOST=true` : uniquement pour lancer `npm run start` en local (inutile sur Vercel).
 
 ## 3. Installer les dépendances
+
+Utiliser Node.js 24 LTS pour installer les dépendances et lancer le projet.
 
 ```bash
 npm install

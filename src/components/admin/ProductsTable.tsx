@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import type { ProductCategory } from "@prisma/client";
+import type { ProductCategory } from "@/generated/prisma/enums";
 import { CATEGORY_LABEL } from "@/lib/types";
 import { deleteProducts, moveProduct, setProductsPublished } from "@/lib/actions/products";
 import { ActionsMenu, type MenuItem } from "./ActionsMenu";
